@@ -1,0 +1,126 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
+
+import { useMemo, useState } from "react";
+import { GeoJSON, MapContainer, TileLayer, Tooltip } from "react-leaflet";
+import geojson from "@/data/sc.json";
+import { Municipality } from "@/types";
+import { fmt, partidoColor, pct, winnerIn } from "@/lib/data";
+import { corAbstencao } from "@/lib/ui";
+import { TILE_ATTRIBUTION, TILE_URL } from "@/lib/map";
+
+type Metrica = "abstencao" | "comparecimento" | "vencedor";
+
+const METRICAS: { id: Metrica; label: string }[] = [
+  { id: "abstencao", label: "Abstenção %" },
+  { id: "comparecimento", label: "Comparecimento %" },
+  { id: "vencedor", label: "Vencedor (Presidente)" },
+];
+
+export default function MapaCoropletico({
+  municipalities,
+}: {
+  municipalities: Municipality[];
+}) {
+  const [metrica, setMetrica] = useState<Metrica>("abstencao");
+
+  const porCod = useMemo(() => {
+    const m = new Map<number, Municipality>();
+    for (const mun of municipalities) m.set(Number(mun.ibge), mun);
+    return m;
+  }, [municipalities]);
+
+  const style = (feature: any) => {
+    const cod = Number(feature?.properties?.codarea);
+    const mun = porCod.get(cod);
+    let fill = "#1e293b";
+    if (mun) {
+      if (metrica === "vencedor") {
+        const w = winnerIn(mun.votos, 1);
+        fill = partidoColor(w?.cand.partido);
+      } else {
+        const base = metrica === "abstencao" ? mun.abst : mun.comp;
+        fill = corAbstencao(pct(base, mun.aptos));
+      }
+    }
+    return { fillColor: fill, fillOpacity: 0.75, color: "#0f172a", weight: 1 };
+  };
+
+  const onEach = (feature: any, layer: any) => {
+    const cod = Number(feature?.properties?.codarea);
+    const mun = porCod.get(cod);
+    if (!mun) return;
+    const w = winnerIn(mun.votos, 1);
+    layer.bindTooltip(
+      `<div style="font-family:inherit">
+        <b>${mun.nome}</b><br/>
+        ${fmt(mun.aptos)} aptos · ${fmt(mun.secoes)} seções<br/>
+        Comparecimento: ${pct(mun.comp, mun.aptos).toFixed(1)}%<br/>
+        Abstenção: <b>${pct(mun.abst, mun.aptos).toFixed(1)}%</b> (${fmt(mun.abst)})<br/>
+        Presidente: ${w ? `${w.cand.nome} (${w.cand.partido ?? "–"}) · ${w.pctValidos.toFixed(1)}% dos válidos` : "—"}
+      </div>`
+    );
+  };
+
+  return (
+    <div>
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        {METRICAS.map((mtr) => (
+          <button
+            key={mtr.id}
+            onClick={() => setMetrica(mtr.id)}
+            className={`rounded-lg border px-3 py-1.5 text-xs ${
+              metrica === mtr.id
+                ? "border-slate-500 bg-slate-700 text-slate-100"
+                : "border-slate-700 bg-slate-900 text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            {mtr.label}
+          </button>
+        ))}
+        {metrica !== "vencedor" ? (
+          <span className="ml-auto flex items-center gap-3 text-xs text-slate-400">
+            <span className="inline-flex items-center gap-1">
+              <span className="inline-block h-3 w-3 rounded-sm bg-green-400" /> &lt;16%
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <span className="inline-block h-3 w-3 rounded-sm bg-yellow-400" /> 16–20%
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <span className="inline-block h-3 w-3 rounded-sm bg-orange-500" /> 20–25%
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <span className="inline-block h-3 w-3 rounded-sm bg-red-600" /> ≥25%
+            </span>
+          </span>
+        ) : (
+          <span className="ml-auto flex items-center gap-3 text-xs text-slate-400">
+            <span className="inline-flex items-center gap-1">
+              <span className="inline-block h-3 w-3 rounded-sm bg-blue-700" /> PL
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <span className="inline-block h-3 w-3 rounded-sm bg-red-500" /> PT
+            </span>
+          </span>
+        )}
+      </div>
+      <MapContainer
+        center={[-27.2, -50.5]}
+        zoom={7}
+        minZoom={6}
+        maxZoom={12}
+        scrollWheelZoom
+        className="h-[560px] w-full rounded-xl border border-slate-700"
+        style={{ background: "#0b1220" }}
+      >
+        <TileLayer attribution={TILE_ATTRIBUTION} url={TILE_URL} />
+        <GeoJSON
+          key={metrica}
+          data={geojson as any}
+          style={style as any}
+          onEachFeature={onEach}
+        />
+      </MapContainer>
+    </div>
+  );
+}

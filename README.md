@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Painel Votação SC
 
-## Getting Started
+Painel de visualização dos resultados eleitorais de Santa Catarina a partir dos boletins de urna (bweb) oficiais do TSE — 1º turno de 2026, com comparativo de 2022 por bairro.
 
-First, run the development server:
+## Stack
+
+- **Next.js 15** (App Router) + TypeScript + Tailwind CSS v4
+- **Recharts** para os gráficos
+- **react-leaflet** para os mapas (tiles CARTO basemaps)
+
+## Rodando localmente
 
 ```bash
+npm install
+cp .env.example .env.local   # e preencha NEXT_PUBLIC_CARTO_KEY
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abra http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+> Sem `NEXT_PUBLIC_CARTO_KEY`, o app funciona com tiles públicos do OpenStreetMap.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Deploy na Vercel
 
-## Learn More
+1. Suba o repositório para o GitHub.
+2. Em [vercel.com/new](https://vercel.com/new), importe o repositório (framework Next.js detectado automaticamente).
+3. Em **Environment Variables**, adicione:
+   - `NEXT_PUBLIC_CARTO_KEY` = sua chave da API de basemaps do CARTO
+4. Deploy.
 
-To learn more about Next.js, take a look at the following resources:
+Variáveis `NEXT_PUBLIC_*` são embutidas no bundle no momento do build — por isso precisam estar configuradas no painel da Vercel antes do deploy.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Estrutura
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+src/
+├── app/page.tsx        # shell: header, navegação, rodapé
+├── lib/
+│   ├── data.ts         # dados (JSONs) + transformações (ranking, winnerIn, presPorBairro)
+│   ├── map.ts          # URL de tiles + attribution (lê NEXT_PUBLIC_CARTO_KEY)
+│   └── ui.tsx          # Card, ChartPanel, estilos de eixo/tooltip, escala de cores
+└── components/
+    ├── charts/         # PresBairroChart
+    ├── tabs/           # VisaoGeralTab, ZonasTab, AbstencaoTab, BairrosTab, CoropleticoTab
+    └── Mapa*.tsx       # componentes de mapa (leaflet, carregados sem SSR)
+```
 
-## Deploy on Vercel
+## Dados
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Os JSONs em `src/data/` são gerados pelo pipeline ETL (fora deste repo) a partir dos bweb do TSE:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `votacao.json` — 1º turno 2026 (SC)
+- `votacao_2022.json` — 1º turno 2022 (SC)
+- `sc.json` — malha municipal do IBGE com nomes
+
+Fonte oficial: [TSE — resultados eleitorais](https://dadosabertos.tse.jus.br/). O painel é uma visualização independente e não substitui a totalização oficial da Justiça Eleitoral.
