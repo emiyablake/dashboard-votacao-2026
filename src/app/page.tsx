@@ -9,7 +9,7 @@ import LocaisTab from "@/components/tabs/LocaisTab";
 import CoropleticoTab from "@/components/tabs/CoropleticoTab";
 import { data, fmt } from "@/lib/data";
 
-type Tab = "geral" | "zonas" | "abstencao" | "bairros" | "locais" | "coropletico";
+type Tab = "geral" | "bairros" | "locais" | "zonas" | "abstencao" | "coropletico";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "geral", label: "Visão geral" },
@@ -22,6 +22,18 @@ const TABS: { id: Tab; label: string }[] = [
 
 export default function Home() {
   const [tab, setTab] = useState<Tab>("geral");
+  // keep-alive: cada aba monta na primeira visita e fica viva (estado preservado)
+  const [visitadas, setVisitadas] = useState<Set<Tab>>(() => new Set<Tab>(["geral"]));
+
+  const vaiPara = (t: Tab) => {
+    setTab(t);
+    setVisitadas((v) => (v.has(t) ? v : new Set(v).add(t)));
+  };
+
+  const painel = (t: Tab, children: React.ReactNode) =>
+    visitadas.has(t) && (
+      <div className={tab === t ? "" : "hidden"}>{children}</div>
+    );
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-200">
@@ -41,7 +53,7 @@ export default function Home() {
           {TABS.map((t) => (
             <button
               key={t.id}
-              onClick={() => setTab(t.id)}
+              onClick={() => vaiPara(t.id)}
               className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
                 tab === t.id
                   ? "bg-blue-600 text-white"
@@ -53,12 +65,12 @@ export default function Home() {
           ))}
         </nav>
 
-        {tab === "geral" && <VisaoGeralTab />}
-        {tab === "bairros" && <BairrosTab />}
-        {tab === "locais" && <LocaisTab />}
-        {tab === "zonas" && <ZonasTab />}
-        {tab === "abstencao" && <AbstencaoTab />}
-        {tab === "coropletico" && <CoropleticoTab />}
+        {painel("geral", <VisaoGeralTab />)}
+        {painel("bairros", <BairrosTab />)}
+        {painel("locais", <LocaisTab />)}
+        {painel("zonas", <ZonasTab />)}
+        {painel("abstencao", <AbstencaoTab />)}
+        {painel("coropletico", <CoropleticoTab />)}
 
         <footer className="mt-10 border-t border-slate-800 pt-4 text-xs text-slate-500">
           Dados oficiais de boletins de urna (arquivo bweb_1t_SC_051020261403, TSE). Este
