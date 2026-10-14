@@ -85,6 +85,21 @@ export interface PresRow {
   cor2: string;
 }
 
+/** local de votacao agregado (escola/igreja etc.) */
+export interface LocalVotacaoRow {
+  ibge: number;
+  mun: string;
+  zona: number;
+  local: number;
+  nmLocal: string | null;
+  bairro: string | null;
+  aptos: number;
+  comp: number;
+  abst: number;
+  secoes: number;
+  votos: MunVote[];
+}
+
 export interface VotacaoData {
   meta: { ano: number; turno: number; eleicao: string; pleito: string; uf: string; geradoEm: string };
   cargoTotals: CargoTotal[];
@@ -93,4 +108,5 @@ export interface VotacaoData {
   zonas: Zona[];
   bairros: Bairro[];
   secoes: SecaoGeo[];
+  locais: LocalVotacaoRow[];
 }

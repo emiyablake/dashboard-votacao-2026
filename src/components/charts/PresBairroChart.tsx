@@ -17,9 +17,11 @@ import { axisStyle, tooltipProps } from "@/lib/ui";
 export default function PresBairroChart({
   titulo,
   dados,
+  altura = 460,
 }: {
   titulo: string;
   dados: PresRow[];
+  altura?: number;
 }) {
   return (
     <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-4">
@@ -49,7 +51,7 @@ export default function PresBairroChart({
           Abstenção
         </span>
       </div>
-      <ResponsiveContainer width="100%" height={460}>
+      <ResponsiveContainer width="100%" height={altura}>
         <BarChart data={dados} layout="vertical" barCategoryGap="20%">
           <CartesianGrid stroke="#1e293b" horizontal={false} />
           <XAxis type="number" tick={axisStyle} tickFormatter={(v) => fmt(v)} />

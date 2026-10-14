@@ -1,4 +1,4 @@
-import { Bairro, Candidate, Municipality, PresRow, VotacaoData, Zona } from "@/types";
+import { Bairro, Candidate, LocalVotacaoRow, Municipality, PresRow, VotacaoData, Zona } from "@/types";
 import raw from "@/data/votacao.json";
 import raw2022 from "@/data/votacao_2022.json";
 
@@ -86,15 +86,23 @@ export function winnerIn(
   return winnerInOf(data, votos, cdCargo);
 }
 
+/** fonte generica para o grafico empilhado de Presidente */
+export interface PresSource {
+  label: string;
+  aptos: number;
+  abst: number;
+  votos: Municipality["votos"];
+}
+
 /**
- * top 15 bairros (por aptos) com votação de Presidente empilhada:
+ * top N linhas (por aptos) com votação de Presidente empilhada:
  * 2 líderes + demais candidatos + brancos/nulos + abstenção
- * (a soma das barras equivale ao eleitorado apto do bairro)
+ * (a soma das barras equivale ao eleitorado apto da linha)
  */
-export function presPorBairro(ds: VotacaoData, lista: Bairro[]): PresRow[] {
+export function presRows(ds: VotacaoData, lista: PresSource[], top = 15): PresRow[] {
   return [...lista]
     .sort((a, b) => b.aptos - a.aptos)
-    .slice(0, 15)
+    .slice(0, top)
     .map((b) => {
       const contagem = new Map<number, number>();
       for (const v of b.votos) {
@@ -115,7 +123,7 @@ export function presPorBairro(ds: VotacaoData, lista: Bairro[]): PresRow[] {
       const [l1, l2] = nominais;
       const outros = nominais.slice(2).reduce((s, x) => s + x.n, 0);
       return {
-        bairro: b.bairro,
+        bairro: b.label,
         lider1: l1?.n ?? 0,
         lider2: l2?.n ?? 0,
         outros,
@@ -129,6 +137,16 @@ export function presPorBairro(ds: VotacaoData, lista: Bairro[]): PresRow[] {
       };
     });
 }
+
+export const presPorBairro = (ds: VotacaoData, lista: Bairro[], top = 15): PresRow[] =>
+  presRows(ds, lista.map((b) => ({ label: b.bairro, aptos: b.aptos, abst: b.abst, votos: b.votos })), top);
+
+export const presPorLocal = (ds: VotacaoData, lista: LocalVotacaoRow[], top = 15): PresRow[] =>
+  presRows(
+    ds,
+    lista.map((l) => ({ label: l.nmLocal ?? `Local ${l.local}`, aptos: l.aptos, abst: l.abst, votos: l.votos })),
+    top
+  );
 
 export const PARTIDO_COLORS: Record<string, string> = {
   PL: "#1d4ed8",
