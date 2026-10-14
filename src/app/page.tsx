@@ -13,10 +13,10 @@ type Tab = "geral" | "zonas" | "abstencao" | "bairros" | "locais" | "coropletico
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "geral", label: "Visão geral" },
-  { id: "zonas", label: "Zonas eleitorais" },
-  { id: "abstencao", label: "Abstenções" },
   { id: "bairros", label: "Bairros" },
   { id: "locais", label: "Locais de votação" },
+  { id: "zonas", label: "Zonas eleitorais" },
+  { id: "abstencao", label: "Abstenções" },
   { id: "coropletico", label: "Mapa coroplético" },
 ];
 
@@ -54,10 +54,10 @@ export default function Home() {
         </nav>
 
         {tab === "geral" && <VisaoGeralTab />}
-        {tab === "zonas" && <ZonasTab />}
-        {tab === "abstencao" && <AbstencaoTab />}
         {tab === "bairros" && <BairrosTab />}
         {tab === "locais" && <LocaisTab />}
+        {tab === "zonas" && <ZonasTab />}
+        {tab === "abstencao" && <AbstencaoTab />}
         {tab === "coropletico" && <CoropleticoTab />}
 
         <footer className="mt-10 border-t border-slate-800 pt-4 text-xs text-slate-500">
