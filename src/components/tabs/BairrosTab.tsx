@@ -3,9 +3,10 @@
 import { useMemo, useState } from "react";
 import PresBairroChart from "@/components/charts/PresBairroChart";
 import ComboBox from "@/components/ui/ComboBox";
-import { data, data2022, fmt, partidoColor, presPorBairro, pct, winnerIn } from "@/lib/data";
+import { data, data2022, fmt, partidoColor, presPorBairro, pct, winnerInOf } from "@/lib/data";
 import { slug } from "@/lib/download";
 import { ExportMenu } from "@/lib/ui";
+import { Bairro } from "@/types";
 
 const MUNICIPIOS = [...data.municipalities]
   .sort((a, b) => b.aptos - a.aptos)
@@ -26,28 +27,63 @@ export default function BairrosTab() {
   const pres26 = useMemo(() => presPorBairro(data, bairrosDoMun), [bairrosDoMun]);
   const pres22 = useMemo(() => presPorBairro(data2022, bairrosDoMun22), [bairrosDoMun22]);
 
+  // tabela pareada por nome do bairro (cadastros podem divergir entre os anos)
+  const linhas = useMemo(() => {
+    const m26 = new Map(bairrosDoMun.map((b) => [b.bairro, b]));
+    const m22 = new Map(bairrosDoMun22.map((b) => [b.bairro, b]));
+    const chaves = [...new Set([...m26.keys(), ...m22.keys()])].sort((a, b) => {
+      const aa = m26.get(a)?.aptos ?? m22.get(a)?.aptos ?? 0;
+      const bb = m26.get(b)?.aptos ?? m22.get(b)?.aptos ?? 0;
+      return bb - aa;
+    });
+    return chaves.map((k) => ({ k, b26: m26.get(k), b22: m22.get(k) }));
+  }, [bairrosDoMun, bairrosDoMun22]);
+
+  const vencedorCell = (b: Bairro | undefined, ds: typeof data) => {
+    if (!b) return <td className="px-3 py-2 text-slate-600">—</td>;
+    const w = winnerInOf(ds, b.votos, 1);
+    return (
+      <td className="px-3 py-2">
+        {w && (
+          <span
+            className="mr-1 inline-block h-2.5 w-2.5 rounded-full"
+            style={{ background: partidoColor(w.cand.partido) }}
+          />
+        )}
+        {w ? `${w.cand.nome} (${w.pctValidos.toFixed(1)}%)` : "—"}
+      </td>
+    );
+  };
+
   const dadosBairros = () => {
     const munNome =
       data.municipalities.find((m) => m.ibge === munBairro)?.nome ?? String(munBairro);
     return {
-      nome: `votacao-sc-bairros-${slug(munNome)}-${data.meta.ano}`,
-      titulo: `Presidente ${data.meta.ano} — votação por bairro · ${munNome}`,
-      linhas: [...bairrosDoMun]
-        .sort((a, b) => b.aptos - a.aptos)
-        .map((b) => {
-          const w = winnerIn(b.votos, 1);
-          return {
-            bairro: b.bairro,
-            secoes: b.secoes,
-            aptos: b.aptos,
-            comparecimento: b.comp,
-            abstencoes: b.abst,
-            taxa_abstencao_pct: Number(pct(b.abst, b.aptos).toFixed(1)),
-            vencedor_presidente: w?.cand.nome ?? "",
-            partido: w?.cand.partido ?? "",
-            votos_vencedor: w?.votos ?? "",
-          };
-        }),
+      nome: `votacao-sc-bairros-${slug(munNome)}-${data.meta.ano}-x-${data2022.meta.ano}`,
+      titulo: `Votação por bairro · ${munNome} (${data.meta.ano} × ${data2022.meta.ano})`,
+      linhas: linhas.map(({ k, b26, b22 }) => {
+        const w26 = b26 ? winnerInOf(data, b26.votos, 1) : null;
+        const w22 = b22 ? winnerInOf(data2022, b22.votos, 1) : null;
+        return {
+          bairro: k,
+          secoes_2026: b26?.secoes ?? "",
+          aptos_2026: b26?.aptos ?? "",
+          abstencoes_2026: b26?.abst ?? "",
+          taxa_abstencao_2026_pct: b26
+            ? Number(pct(b26.abst, b26.aptos).toFixed(1))
+            : "",
+          vencedor_2026: w26?.cand.nome ?? "",
+          partido_2026: w26?.cand.partido ?? "",
+          secoes_2022: b22?.secoes ?? "",
+          aptos_2022: b22?.aptos ?? "",
+          abstencoes_2022: b22?.abst ?? "",
+          taxa_abstencao_2022_pct: b22
+            ? Number(pct(b22.abst, b22.aptos).toFixed(1))
+            : "",
+          vencedor_2022: w22?.cand.nome ?? "",
+          partido_2022: w22?.cand.partido ?? "",
+        };
+      }),
     };
   };
 
@@ -61,10 +97,7 @@ export default function BairrosTab() {
           placeholder="Buscar município…"
           width="w-72"
         />
-        <span className="text-xs text-slate-400">
-          {bairrosDoMun.length} bairros ·{" "}
-          {fmt(bairrosDoMun.reduce((s, b) => s + b.aptos, 0))} aptos
-        </span>
+        <span className="text-xs text-slate-400">{linhas.length} bairros</span>
         <div className="ml-auto">
           <ExportMenu getDados={dadosBairros} />
         </div>
@@ -86,40 +119,27 @@ export default function BairrosTab() {
           <thead className="bg-slate-900 text-xs uppercase text-slate-400">
             <tr>
               <th className="px-3 py-2 text-left">Bairro</th>
-              <th className="px-3 py-2 text-left">Seções</th>
-              <th className="px-3 py-2 text-left">Aptos</th>
-              <th className="px-3 py-2 text-left">Comparecimento</th>
-              <th className="px-3 py-2 text-left">Abstenção</th>
-              <th className="px-3 py-2 text-left">Vencedor (Presidente)</th>
+              <th className="px-3 py-2 text-left">Aptos 26/22</th>
+              <th className="px-3 py-2 text-left">Abstenção 26/22</th>
+              <th className="px-3 py-2 text-left">Vencedor {data.meta.ano}</th>
+              <th className="px-3 py-2 text-left">Vencedor {data2022.meta.ano}</th>
             </tr>
           </thead>
           <tbody>
-            {bairrosDoMun.map((b) => {
-              const w = winnerIn(b.votos, 1);
+            {linhas.map(({ k, b26, b22 }) => {
+              const aptosTxt = [b26, b22]
+                .map((b) => (b ? fmt(b.aptos) : "—"))
+                .join(" / ");
+              const abstTxt = [b26, b22]
+                .map((b) => (b ? `${pct(b.abst, b.aptos).toFixed(1)}%` : "—"))
+                .join(" / ");
               return (
-                <tr key={b.bairro} className="border-t border-slate-800 hover:bg-slate-900/60">
-                  <td className="px-3 py-2 font-medium text-slate-100">{b.bairro}</td>
-                  <td className="px-3 py-2">{b.secoes}</td>
-                  <td className="px-3 py-2">{fmt(b.aptos)}</td>
-                  <td className="px-3 py-2">
-                    {fmt(b.comp)}{" "}
-                    <span className="text-slate-500">({pct(b.comp, b.aptos).toFixed(1)}%)</span>
-                  </td>
-                  <td className="px-3 py-2">
-                    {fmt(b.abst)}{" "}
-                    <span className="text-slate-500">({pct(b.abst, b.aptos).toFixed(1)}%)</span>
-                  </td>
-                  <td className="px-3 py-2">
-                    {w && (
-                      <span
-                        className="mr-1 inline-block h-2.5 w-2.5 rounded-full"
-                        style={{ background: partidoColor(w.cand.partido) }}
-                      />
-                    )}
-                    {w
-                      ? `${w.cand.nome} · ${fmt(w.votos)} (${w.pctValidos.toFixed(1)}%)`
-                      : "—"}
-                  </td>
+                <tr key={k} className="border-t border-slate-800 hover:bg-slate-900/60">
+                  <td className="px-3 py-2 font-medium text-slate-100">{k}</td>
+                  <td className="px-3 py-2">{aptosTxt}</td>
+                  <td className="px-3 py-2">{abstTxt}</td>
+                  {vencedorCell(b26, data)}
+                  {vencedorCell(b22, data2022)}
                 </tr>
               );
             })}
