@@ -4,6 +4,8 @@ import { useMemo, useState } from "react";
 import PresBairroChart from "@/components/charts/PresBairroChart";
 import ComboBox from "@/components/ui/ComboBox";
 import { data, data2022, fmt, partidoColor, presPorBairro, pct, winnerIn } from "@/lib/data";
+import { downloadCSV, slug } from "@/lib/download";
+import { ExportButton } from "@/lib/ui";
 
 const MUNICIPIOS = [...data.municipalities]
   .sort((a, b) => b.aptos - a.aptos)
@@ -24,6 +26,30 @@ export default function BairrosTab() {
   const pres26 = useMemo(() => presPorBairro(data, bairrosDoMun), [bairrosDoMun]);
   const pres22 = useMemo(() => presPorBairro(data2022, bairrosDoMun22), [bairrosDoMun22]);
 
+  const exportarBairros = () => {
+    const munNome =
+      data.municipalities.find((m) => m.ibge === munBairro)?.nome ?? String(munBairro);
+    downloadCSV(
+      `votacao-sc-bairros-${slug(munNome)}-${data.meta.ano}`,
+      [...bairrosDoMun]
+        .sort((a, b) => b.aptos - a.aptos)
+        .map((b) => {
+          const w = winnerIn(b.votos, 1);
+          return {
+            bairro: b.bairro,
+            secoes: b.secoes,
+            aptos: b.aptos,
+            comparecimento: b.comp,
+            abstencoes: b.abst,
+            taxa_abstencao_pct: Number(pct(b.abst, b.aptos).toFixed(1)),
+            vencedor_presidente: w?.cand.nome ?? "",
+            partido: w?.cand.partido ?? "",
+            votos_vencedor: w?.votos ?? "",
+          };
+        })
+    );
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3">
@@ -38,6 +64,9 @@ export default function BairrosTab() {
           {bairrosDoMun.length} bairros ·{" "}
           {fmt(bairrosDoMun.reduce((s, b) => s + b.aptos, 0))} aptos
         </span>
+        <div className="ml-auto">
+          <ExportButton onClick={exportarBairros} />
+        </div>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">

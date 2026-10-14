@@ -16,7 +16,8 @@ import {
   ZAxis,
 } from "recharts";
 import { data, fmt, pct } from "@/lib/data";
-import { axisStyle, Card, ChartPanel, tooltipProps } from "@/lib/ui";
+import { downloadCSV } from "@/lib/download";
+import { axisStyle, Card, ChartPanel, ExportButton, tooltipProps } from "@/lib/ui";
 
 const MapaAbstencao = dynamic(() => import("@/components/MapaAbstencao"), { ssr: false });
 
@@ -48,6 +49,18 @@ export default function AbstencaoTab() {
     zona: `Zona ${z.zona}`,
     muns: z.muns.join(", "),
   }));
+
+  const exportarAbstencoes = () =>
+    downloadCSV(
+      `votacao-sc-abstencoes-zonas-${data.meta.ano}`,
+      pareto.map((p) => ({
+        zona: p.zona.replace("Zona ", ""),
+        municipios: p.muns,
+        abstencoes: p.abst,
+        perc_do_total_pct: Number(((p.abst / totalAbst) * 100).toFixed(1)),
+        acumulado_pct: p.acum,
+      }))
+    );
 
   return (
     <div className="space-y-6">
@@ -90,6 +103,7 @@ export default function AbstencaoTab() {
       <ChartPanel
         titulo="Pareto das abstenções por zona (volume absoluto)"
         descricao="Barras = abstenções em cada zona · Linha = % acumulado do total do estado. A curva mostra como o volume se concentra em poucas zonas."
+        acao={<ExportButton onClick={exportarAbstencoes} />}
       >
         <ResponsiveContainer width="100%" height={320}>
           <ComposedChart data={pareto.slice(0, 25)}>

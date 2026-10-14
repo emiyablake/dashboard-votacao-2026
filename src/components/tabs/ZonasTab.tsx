@@ -10,7 +10,8 @@ import {
   YAxis,
 } from "recharts";
 import { data, fmt, pct } from "@/lib/data";
-import { axisStyle, ChartPanel, tooltipProps } from "@/lib/ui";
+import { downloadCSV } from "@/lib/download";
+import { axisStyle, ChartPanel, ExportButton, tooltipProps } from "@/lib/ui";
 
 export default function ZonasTab() {
   const topAbst = [...data.zonas]
@@ -23,11 +24,28 @@ export default function ZonasTab() {
     .sort((a, b) => b.abst - a.abst)
     .slice(0, 20);
 
+  const exportarZonas = () =>
+    downloadCSV(
+      `votacao-sc-zonas-${data.meta.ano}`,
+      [...data.zonas]
+        .sort((a, b) => b.aptos - a.aptos)
+        .map((z) => ({
+          zona: z.zona,
+          municipios: z.muns.join(", "),
+          secoes: z.secoes,
+          aptos: z.aptos,
+          comparecimento: z.comp,
+          abstencoes: z.abst,
+          taxa_abstencao_pct: Number(pct(z.abst, z.aptos).toFixed(1)),
+        }))
+    );
+
   return (
     <div className="space-y-6">
       <ChartPanel
         titulo="Zonas com maior abstenção (top 20)"
         descricao="Passe o mouse sobre a barra para ver os municípios atendidos pela zona."
+        acao={<ExportButton onClick={exportarZonas} />}
       >
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={topAbst}>

@@ -33,6 +33,34 @@ export function ChartPanel({
   );
 }
 
+/** botao de exportacao CSV, alinhado a direita na linha de filtros (ml-auto) */
+export function ExportButton({ onClick, label = "Baixar CSV" }: { onClick: () => void; label?: string }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs font-medium text-slate-200 transition-colors hover:border-slate-500 hover:bg-slate-700"
+    >
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <polyline points="7 10 12 15 17 10" />
+        <line x1="12" y1="15" x2="12" y2="3" />
+      </svg>
+      {label}
+    </button>
+  );
+}
+
 export const axisStyle = { fill: "#94a3b8", fontSize: 12 };
 
 export const tooltipProps = {
