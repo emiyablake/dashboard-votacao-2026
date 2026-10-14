@@ -20,7 +20,7 @@ const sel =
 
 export default function LocaisTab() {
   const [munLoc, setMunLoc] = useState(4205407); // Florianópolis
-  const [bairroLoc, setBairroLoc] = useState(""); // "" = todos
+  const [bairroLoc, setBairroLoc] = useState(""); // "" = primeiro bairro da lista
   const [localSel, setLocalSel] = useState(""); // "" = top 15
 
   const locais26 = useMemo(
@@ -41,11 +41,14 @@ export default function LocaisTab() {
     return [...mapa.entries()].sort((a, b) => b[1] - a[1]).map(([b]) => b);
   }, [locais26, locais22]);
 
+  // bairro efetivo: o selecionado se existir no municipio, senao o primeiro
+  const bairroAtual = bairros.includes(bairroLoc) ? bairroLoc : (bairros[0] ?? "");
+
   // filtro por bairro aplicado no proprio campo de cada ano
   const filtra = (lista: LocalVotacaoRow[]) =>
-    bairroLoc ? lista.filter((l) => l.bairro === bairroLoc) : lista;
-  const filtrados26 = useMemo(() => filtra(locais26), [locais26, bairroLoc]); // eslint-disable-line react-hooks/exhaustive-deps
-  const filtrados22 = useMemo(() => filtra(locais22), [locais22, bairroLoc]); // eslint-disable-line react-hooks/exhaustive-deps
+    lista.filter((l) => l.bairro === bairroAtual);
+  const filtrados26 = useMemo(() => filtra(locais26), [locais26, bairroAtual]); // eslint-disable-line react-hooks/exhaustive-deps
+  const filtrados22 = useMemo(() => filtra(locais22), [locais22, bairroAtual]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // locais no select: uniao dos dois anos pelo codigo (zona:local)
   const locaisOptions = useMemo(() => {
@@ -130,8 +133,7 @@ export default function LocaisTab() {
               </option>
             ))}
         </select>
-        <select value={bairroLoc} onChange={(e) => onBairro(e.target.value)} className={sel}>
-          <option value="">Todos os bairros</option>
+        <select value={bairroAtual} onChange={(e) => onBairro(e.target.value)} className={sel}>
           {bairros.map((b) => (
             <option key={b} value={b}>
               {b}
@@ -156,19 +158,21 @@ export default function LocaisTab() {
           titulo={
             foco
               ? `Presidente ${data.meta.ano} — ${sel26[0]?.nmLocal ?? "local sem dados em " + data.meta.ano}`
-              : `Presidente ${data.meta.ano} — locais de votação (top 15)`
+              : `Presidente ${data.meta.ano} — ${bairroAtual} (top 15 locais)`
           }
           dados={chart26}
-          altura={foco ? 200 : 460}
+          altura={foco ? 220 : 560}
+          larguraLabel={230}
         />
         <PresBairroChart
           titulo={
             foco
               ? `Presidente ${data2022.meta.ano} — ${sel22[0]?.nmLocal ?? sel26[0]?.nmLocal ?? "local"}`
-              : `Presidente ${data2022.meta.ano} — locais de votação (top 15)`
+              : `Presidente ${data2022.meta.ano} — ${bairroAtual} (top 15 locais)`
           }
           dados={chart22}
-          altura={foco ? 200 : 460}
+          altura={foco ? 220 : 560}
+          larguraLabel={230}
         />
       </div>
 

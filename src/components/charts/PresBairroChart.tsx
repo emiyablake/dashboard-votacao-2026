@@ -18,10 +18,12 @@ export default function PresBairroChart({
   titulo,
   dados,
   altura = 460,
+  larguraLabel = 150,
 }: {
   titulo: string;
   dados: PresRow[];
   altura?: number;
+  larguraLabel?: number;
 }) {
   return (
     <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-4">
@@ -55,7 +57,12 @@ export default function PresBairroChart({
         <BarChart data={dados} layout="vertical" barCategoryGap="20%">
           <CartesianGrid stroke="#1e293b" horizontal={false} />
           <XAxis type="number" tick={axisStyle} tickFormatter={(v) => fmt(v)} />
-          <YAxis type="category" dataKey="bairro" width={150} tick={axisStyle} />
+          <YAxis
+            type="category"
+            dataKey="bairro"
+            width={larguraLabel}
+            tick={{ ...axisStyle, fontSize: 11 }}
+          />
           <Tooltip
             {...tooltipProps}
             formatter={(v, name, item) => {
