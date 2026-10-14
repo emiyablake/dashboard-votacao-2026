@@ -110,3 +110,53 @@ export interface VotacaoData {
   secoes: SecaoGeo[];
   locais: LocalVotacaoRow[];
 }
+
+/** emprego formal agregado da RAIS em um ano */
+export interface RaisAno {
+  vinculos: number;
+  salario_medio: number | null;
+  salario_mediano: number | null;
+  massa_salarial_dez: number | null;
+  pct_mulheres: number | null;
+  idade_media: number | null;
+  pct_18_29: number | null;
+  pct_60_mais: number | null;
+  pct_superior: number | null;
+  pct_sem_fundamental: number | null;
+  pct_preta_parda: number | null;
+  pct_agro: number | null;
+  pct_industria: number | null;
+  pct_construcao: number | null;
+  pct_comercio: number | null;
+  pct_servicos: number | null;
+  pct_micro_peq: number | null;
+}
+
+/** indicadores socioeconomicos de um municipio (Censo 2022 + RAIS 2024/2025) */
+export interface SocioMun {
+  ibge: string;
+  nome: string;
+  populacao: number;
+  domicilios: number;
+  moradores_medio: number | null;
+  area_km2: number | null;
+  densidade: number | null;
+  pct_homens: number | null;
+  pct_0_14: number | null;
+  pct_15_29: number | null;
+  pct_30_59: number | null;
+  pct_60_mais: number | null;
+  pct_brancos: number | null;
+  pct_pretos: number | null;
+  pct_amarelos: number | null;
+  pct_pardos: number | null;
+  pct_indigenas: number | null;
+  pct_alfabetizadas_15: number | null;
+  pct_agua_rede: number | null;
+  pct_esgoto_rede: number | null;
+  pct_lixo_coletado: number | null;
+  pct_banheiro: number | null;
+  rais_2024?: RaisAno;
+  rais_2025?: RaisAno;
+  variacao_vinculos_24_25?: number;
+}

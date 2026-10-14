@@ -1,9 +1,14 @@
-import { Bairro, Candidate, LocalVotacaoRow, Municipality, PresRow, VotacaoData, Zona } from "@/types";
+import { Bairro, Candidate, LocalVotacaoRow, Municipality, PresRow, SocioMun, VotacaoData, Zona } from "@/types";
 import raw from "@/data/votacao.json";
 import raw2022 from "@/data/votacao_2022.json";
+import rawSocio from "@/data/socio_sc.json";
 
 export const data = raw as unknown as VotacaoData;
 export const data2022 = raw2022 as unknown as VotacaoData;
+export const socio = rawSocio as unknown as SocioMun[];
+
+const socioMapa = new Map(socio.map((s) => [s.ibge, s]));
+export const socioPorIbge = (ibge: number | string) => socioMapa.get(String(ibge));
 
 export const CARGOS = [
   { cd: 1, nome: "Presidente" },
