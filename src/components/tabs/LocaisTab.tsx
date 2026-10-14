@@ -12,8 +12,8 @@ import {
   presPorLocal,
   winnerInOf,
 } from "@/lib/data";
-import { downloadCSV, slug } from "@/lib/download";
-import { ExportButton } from "@/lib/ui";
+import { slug } from "@/lib/download";
+import { ExportMenu } from "@/lib/ui";
 import { LocalVotacaoRow } from "@/types";
 
 const keyOf = (l: LocalVotacaoRow) => `${l.zona}:${l.local}`;
@@ -128,12 +128,13 @@ export default function LocaisTab() {
     );
   };
 
-  const exportarLocais = () => {
+  const dadosLocais = () => {
     const munNome =
       data.municipalities.find((m) => m.ibge === munLoc)?.nome ?? String(munLoc);
-    downloadCSV(
-      `votacao-sc-locais-${slug(munNome)}-${slug(bairroAtual || "todos")}`,
-      linhas.map(({ l26, l22 }) => {
+    return {
+      nome: `votacao-sc-locais-${slug(munNome)}-${slug(bairroAtual || "todos")}`,
+      titulo: `Locais de votação — ${munNome} · ${bairroAtual || "todos os bairros"} (${data.meta.ano} × ${data2022.meta.ano})`,
+      linhas: linhas.map(({ l26, l22 }) => {
         const w26 = l26 ? winnerInOf(data, l26.votos, 1) : null;
         const w22 = l22 ? winnerInOf(data2022, l22.votos, 1) : null;
         return {
@@ -156,8 +157,8 @@ export default function LocaisTab() {
           vencedor_2022: w22?.cand.nome ?? "",
           partido_2022: w22?.cand.partido ?? "",
         };
-      })
-    );
+      }),
+    };
   };
 
   return (
@@ -189,7 +190,7 @@ export default function LocaisTab() {
           {linhas.length} locais · clique numa linha da tabela para focar o gráfico nela
         </span>
         <div className="ml-auto">
-          <ExportButton onClick={exportarLocais} />
+          <ExportMenu getDados={dadosLocais} />
         </div>
       </div>
 

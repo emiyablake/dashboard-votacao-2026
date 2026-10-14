@@ -13,8 +13,7 @@ import {
   YAxis,
 } from "recharts";
 import { CARGOS, cargoStats, data, fmt, partidoColor, pct, ranking } from "@/lib/data";
-import { downloadCSV } from "@/lib/download";
-import { axisStyle, Card, ChartPanel, ExportButton, tooltipProps } from "@/lib/ui";
+import { axisStyle, Card, ChartPanel, ExportMenu, tooltipProps } from "@/lib/ui";
 
 export default function VisaoGeralTab() {
   const totais = useMemo(() => {
@@ -52,25 +51,25 @@ export default function VisaoGeralTab() {
     </ChartPanel>
   );
 
-  const exportarCandidatos = () =>
-    downloadCSV(
-      `votacao-sc-candidatos-${data.meta.ano}`,
-      [...data.candidates]
-        .sort((a, b) => a.cdCargo - b.cdCargo || b.total - a.total)
-        .map((c) => ({
-          cargo: c.cargo,
-          numero: c.numero,
-          candidato: c.nome,
-          partido: c.partido ?? "",
-          tipo: c.tipo,
-          votos: c.total,
-        }))
-    );
+  const dadosCandidatos = () => ({
+    nome: `votacao-sc-candidatos-${data.meta.ano}`,
+    titulo: `Votação em SC ${data.meta.ano} — candidatos por cargo`,
+    linhas: [...data.candidates]
+      .sort((a, b) => a.cdCargo - b.cdCargo || b.total - a.total)
+      .map((c) => ({
+        cargo: c.cargo,
+        numero: c.numero,
+        candidato: c.nome,
+        partido: c.partido ?? "",
+        tipo: c.tipo,
+        votos: c.total,
+      })),
+  });
 
   return (
     <div className="space-y-6">
       <div className="flex justify-end">
-        <ExportButton onClick={exportarCandidatos} />
+        <ExportMenu getDados={dadosCandidatos} />
       </div>
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
         <Card title="Eleitores aptos" value={fmt(totais.aptos)} />

@@ -4,8 +4,8 @@ import { useMemo, useState } from "react";
 import PresBairroChart from "@/components/charts/PresBairroChart";
 import ComboBox from "@/components/ui/ComboBox";
 import { data, data2022, fmt, partidoColor, presPorBairro, pct, winnerIn } from "@/lib/data";
-import { downloadCSV, slug } from "@/lib/download";
-import { ExportButton } from "@/lib/ui";
+import { slug } from "@/lib/download";
+import { ExportMenu } from "@/lib/ui";
 
 const MUNICIPIOS = [...data.municipalities]
   .sort((a, b) => b.aptos - a.aptos)
@@ -26,12 +26,13 @@ export default function BairrosTab() {
   const pres26 = useMemo(() => presPorBairro(data, bairrosDoMun), [bairrosDoMun]);
   const pres22 = useMemo(() => presPorBairro(data2022, bairrosDoMun22), [bairrosDoMun22]);
 
-  const exportarBairros = () => {
+  const dadosBairros = () => {
     const munNome =
       data.municipalities.find((m) => m.ibge === munBairro)?.nome ?? String(munBairro);
-    downloadCSV(
-      `votacao-sc-bairros-${slug(munNome)}-${data.meta.ano}`,
-      [...bairrosDoMun]
+    return {
+      nome: `votacao-sc-bairros-${slug(munNome)}-${data.meta.ano}`,
+      titulo: `Presidente ${data.meta.ano} — votação por bairro · ${munNome}`,
+      linhas: [...bairrosDoMun]
         .sort((a, b) => b.aptos - a.aptos)
         .map((b) => {
           const w = winnerIn(b.votos, 1);
@@ -46,8 +47,8 @@ export default function BairrosTab() {
             partido: w?.cand.partido ?? "",
             votos_vencedor: w?.votos ?? "",
           };
-        })
-    );
+        }),
+    };
   };
 
   return (
@@ -65,7 +66,7 @@ export default function BairrosTab() {
           {fmt(bairrosDoMun.reduce((s, b) => s + b.aptos, 0))} aptos
         </span>
         <div className="ml-auto">
-          <ExportButton onClick={exportarBairros} />
+          <ExportMenu getDados={dadosBairros} />
         </div>
       </div>
 
