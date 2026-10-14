@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import PresBairroChart from "@/components/charts/PresBairroChart";
+import ComboBox from "@/components/ui/ComboBox";
 import {
   data,
   data2022,
@@ -17,6 +18,10 @@ const keyOf = (l: LocalVotacaoRow) => `${l.zona}:${l.local}`;
 
 const sel =
   "rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm";
+
+const MUNICIPIOS = [...data.municipalities]
+  .sort((a, b) => b.aptos - a.aptos)
+  .map((m) => ({ value: m.ibge, label: m.nome }));
 
 export default function LocaisTab() {
   const [munLoc, setMunLoc] = useState(4205407); // Florianópolis
@@ -124,22 +129,20 @@ export default function LocaisTab() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3">
-        <select value={munLoc} onChange={(e) => onMun(Number(e.target.value))} className={sel}>
-          {[...data.municipalities]
-            .sort((a, b) => b.aptos - a.aptos)
-            .map((m) => (
-              <option key={m.ibge} value={m.ibge}>
-                {m.nome}
-              </option>
-            ))}
-        </select>
-        <select value={bairroAtual} onChange={(e) => onBairro(e.target.value)} className={sel}>
-          {bairros.map((b) => (
-            <option key={b} value={b}>
-              {b}
-            </option>
-          ))}
-        </select>
+        <ComboBox
+          value={munLoc}
+          onChange={(v) => onMun(Number(v))}
+          options={MUNICIPIOS}
+          placeholder="Buscar município…"
+          width="w-72"
+        />
+        <ComboBox
+          value={bairroAtual}
+          onChange={(v) => onBairro(String(v))}
+          options={bairros.map((b) => ({ value: b, label: b }))}
+          placeholder="Buscar bairro…"
+          width="w-56"
+        />
         <select value={localSel} onChange={(e) => setLocalSel(e.target.value)} className={sel}>
           <option value="">Top 15 locais (gráficos)</option>
           {locaisOptions.map((o) => (

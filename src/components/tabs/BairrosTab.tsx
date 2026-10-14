@@ -2,7 +2,12 @@
 
 import { useMemo, useState } from "react";
 import PresBairroChart from "@/components/charts/PresBairroChart";
+import ComboBox from "@/components/ui/ComboBox";
 import { data, data2022, fmt, partidoColor, presPorBairro, pct, winnerIn } from "@/lib/data";
+
+const MUNICIPIOS = [...data.municipalities]
+  .sort((a, b) => b.aptos - a.aptos)
+  .map((m) => ({ value: m.ibge, label: m.nome }));
 
 export default function BairrosTab() {
   const [munBairro, setMunBairro] = useState(4205407); // Florianópolis
@@ -22,19 +27,13 @@ export default function BairrosTab() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3">
-        <select
+        <ComboBox
           value={munBairro}
-          onChange={(e) => setMunBairro(Number(e.target.value))}
-          className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm"
-        >
-          {[...data.municipalities]
-            .sort((a, b) => b.aptos - a.aptos)
-            .map((m) => (
-              <option key={m.ibge} value={m.ibge}>
-                {m.nome}
-              </option>
-            ))}
-        </select>
+          onChange={(v) => setMunBairro(Number(v))}
+          options={MUNICIPIOS}
+          placeholder="Buscar município…"
+          width="w-72"
+        />
         <span className="text-xs text-slate-400">
           {bairrosDoMun.length} bairros ·{" "}
           {fmt(bairrosDoMun.reduce((s, b) => s + b.aptos, 0))} aptos
