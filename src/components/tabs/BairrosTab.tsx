@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import PresBairroChart from "@/components/charts/PresBairroChart";
 import ComboBox from "@/components/ui/ComboBox";
-import { data, data2022, fmt, partidoColor, presPorBairro, pct, winnerInOf } from "@/lib/data";
+import { data, data2022, fmt, partidoColor, presPorBairro, pct, socioPorBairro, winnerInOf } from "@/lib/data";
 import { slug } from "@/lib/download";
 import { ExportMenu } from "@/lib/ui";
 import { Bairro } from "@/types";
@@ -64,6 +64,7 @@ export default function BairrosTab() {
       linhas: linhas.map(({ k, b26, b22 }) => {
         const w26 = b26 ? winnerInOf(data, b26.votos, 1) : null;
         const w22 = b22 ? winnerInOf(data2022, b22.votos, 1) : null;
+        const socio = socioPorBairro(munBairro, k);
         return {
           bairro: k,
           secoes_2026: b26?.secoes ?? "",
@@ -82,6 +83,12 @@ export default function BairrosTab() {
             : "",
           vencedor_2022: w22?.cand.nome ?? "",
           partido_2022: w22?.cand.partido ?? "",
+          censo_2022_populacao: socio?.populacao ?? "",
+          censo_2022_densidade_km2: socio?.densidade ?? "",
+          censo_2022_pct_60_mais: socio?.pct_60_mais ?? "",
+          censo_2022_pct_alfabetizadas_15: socio?.pct_alfabetizadas_15 ?? "",
+          censo_2022_pct_esgoto_rede: socio?.pct_esgoto_rede ?? "",
+          bairro_ibge_referencia: socio?.bairro_ibge ?? "",
         };
       }),
     };
@@ -123,6 +130,11 @@ export default function BairrosTab() {
               <th className="px-3 py-2 text-left">Abstenção 26/22</th>
               <th className="px-3 py-2 text-left">Vencedor {data.meta.ano}</th>
               <th className="px-3 py-2 text-left">Vencedor {data2022.meta.ano}</th>
+              <th className="px-3 py-2 text-left">Pop. Censo</th>
+              <th className="px-3 py-2 text-left">Densid.</th>
+              <th className="px-3 py-2 text-left">60+</th>
+              <th className="px-3 py-2 text-left">Alfabet. 15+</th>
+              <th className="px-3 py-2 text-left">Esgoto</th>
             </tr>
           </thead>
           <tbody>
@@ -133,6 +145,9 @@ export default function BairrosTab() {
               const abstTxt = [b26, b22]
                 .map((b) => (b ? `${pct(b.abst, b.aptos).toFixed(1)}%` : "—"))
                 .join(" / ");
+              const socio = socioPorBairro(munBairro, k);
+              const num1 = (n: number | null | undefined) =>
+                n == null ? "—" : n.toFixed(1);
               return (
                 <tr key={k} className="border-t border-slate-800 hover:bg-slate-900/60">
                   <td className="px-3 py-2 font-medium text-slate-100">{k}</td>
@@ -140,12 +155,28 @@ export default function BairrosTab() {
                   <td className="px-3 py-2">{abstTxt}</td>
                   {vencedorCell(b26, data)}
                   {vencedorCell(b22, data2022)}
+                  <td className="px-3 py-2" title={socio?.bairro_ibge ? `Bairro IBGE de referência: ${socio.bairro_ibge}` : undefined}>
+                    {socio?.populacao != null ? fmt(socio.populacao) : "—"}
+                  </td>
+                  <td className="px-3 py-2">
+                    {socio?.densidade != null ? `${num1(socio.densidade)}/km²` : "—"}
+                  </td>
+                  <td className="px-3 py-2">{num1(socio?.pct_60_mais)}%</td>
+                  <td className="px-3 py-2">{num1(socio?.pct_alfabetizadas_15)}%</td>
+                  <td className="px-3 py-2">{num1(socio?.pct_esgoto_rede)}%</td>
                 </tr>
               );
             })}
           </tbody>
         </table>
       </div>
+
+      <p className="text-xs text-slate-500">
+        Colunas &quot;Censo&quot;: Censo Demográfico 2022 (IBGE), associado por cruzamento
+        espacial ao bairro oficial onde a maioria das seções do bairro eleitoral vota. Só
+        municípios com bairros oficiais cadastrados no IBGE possuem dados; os demais aparecem
+        com &quot;—&quot;.
+      </p>
     </div>
   );
 }

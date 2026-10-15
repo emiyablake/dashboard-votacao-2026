@@ -94,6 +94,11 @@ export default function SocioeconomicoTab() {
       salario_mediano_2025: l.rais_2025?.salario_mediano ?? "",
       pct_superior_rais_2025: l.rais_2025?.pct_superior ?? "",
       pct_industria_rais_2025: l.rais_2025?.pct_industria ?? "",
+      pct_dirigentes_prof_2025: l.rais_2025?.pct_dirigentes_prof ?? "",
+      pct_servicos_vendas_2025: l.rais_2025?.pct_servicos_vendas ?? "",
+      pct_ind_construcao_2025: l.rais_2025?.pct_ind_construcao ?? "",
+      pct_operarios_2025: l.rais_2025?.pct_operarios ?? "",
+      pct_agro_ocupacao_2025: l.rais_2025?.pct_agro_cbo ?? "",
     })),
   });
 
@@ -162,6 +167,9 @@ export default function SocioeconomicoTab() {
               <th className="px-3 py-2 text-left">Vínculos 25/24</th>
               <th className="px-3 py-2 text-left">Variação</th>
               <th className="px-3 py-2 text-left">Salário médio 25</th>
+              <th className="px-3 py-2 text-left">Prof./dirigentes</th>
+              <th className="px-3 py-2 text-left">Serv./vendas</th>
+              <th className="px-3 py-2 text-left">Indúst./operários</th>
             </tr>
           </thead>
           <tbody>
@@ -199,6 +207,17 @@ export default function SocioeconomicoTab() {
                     {varV == null ? "—" : `${varV >= 0 ? "+" : ""}${varV.toFixed(1)}%`}
                   </td>
                   <td className="px-3 py-2">{moeda(l.rais_2025?.salario_medio)}</td>
+                  <td className="px-3 py-2">{num1(l.rais_2025?.pct_dirigentes_prof)}%</td>
+                  <td className="px-3 py-2">{num1(l.rais_2025?.pct_servicos_vendas)}%</td>
+                  <td className="px-3 py-2">
+                    {l.rais_2025
+                      ? num1(
+                          (l.rais_2025.pct_ind_construcao ?? 0) +
+                            (l.rais_2025.pct_operarios ?? 0)
+                        )
+                      : "—"}
+                    %
+                  </td>
                 </tr>
               );
             })}

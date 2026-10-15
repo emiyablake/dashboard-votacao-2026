@@ -130,6 +130,13 @@ export interface RaisAno {
   pct_comercio: number | null;
   pct_servicos: number | null;
   pct_micro_peq: number | null;
+  pct_dirigentes_prof: number | null;
+  pct_tecnicos: number | null;
+  pct_servicos_vendas: number | null;
+  pct_agro_cbo: number | null;
+  pct_ind_construcao: number | null;
+  pct_operarios: number | null;
+  pct_militares: number | null;
 }
 
 /** indicadores socioeconomicos de um municipio (Censo 2022 + RAIS 2024/2025) */
@@ -159,4 +166,28 @@ export interface SocioMun {
   rais_2024?: RaisAno;
   rais_2025?: RaisAno;
   variacao_vinculos_24_25?: number;
+}
+
+/** perfil censitario (Censo 2022) de um bairro eleitoral, via cruzamento
+ * espacial com o bairro oficial IBGE onde a maioria de suas secoes vota */
+export interface BairroSocio {
+  ibge: number;
+  municipio: string;
+  bairro: string;
+  cd_bairro_ibge: string | null;
+  bairro_ibge: string | null;
+  populacao: number | null;
+  area_km2: number | null;
+  densidade: number | null;
+  pct_homens: number | null;
+  pct_60_mais: number | null;
+  pct_0_14: number | null;
+  pct_alfabetizadas_15: number | null;
+  pct_pardos: number | null;
+  pct_pretos: number | null;
+  pct_brancos: number | null;
+  pct_esgoto_rede: number | null;
+  bairros_ibge: number;
+  cobertura_pct: number | null;
+  secoes: number;
 }
