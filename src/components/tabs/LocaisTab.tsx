@@ -19,7 +19,7 @@ import { LocalVotacaoRow } from "@/types";
 const keyOf = (l: LocalVotacaoRow) => `${l.zona}:${l.local}`;
 
 const sel =
-  "rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm";
+  "rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm";
 
 const MUNICIPIOS = [...data.municipalities]
   .sort((a, b) => b.aptos - a.aptos)
@@ -113,7 +113,7 @@ export default function LocaisTab() {
   };
 
   const vencedorCell = (l: LocalVotacaoRow | undefined, ds: typeof data) => {
-    if (!l) return <td className="px-3 py-2 text-slate-600">—</td>;
+    if (!l) return <td className="px-3 py-2 text-zinc-600">—</td>;
     const w = winnerInOf(ds, l.votos, 1);
     return (
       <td className="px-3 py-2">
@@ -186,7 +186,7 @@ export default function LocaisTab() {
             </option>
           ))}
         </select>
-        <span className="text-xs text-slate-400">
+        <span className="text-xs text-zinc-400">
           {linhas.length} locais · clique numa linha da tabela para focar o gráfico nela
         </span>
         <div className="ml-auto">
@@ -217,9 +217,9 @@ export default function LocaisTab() {
         />
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-slate-800">
+      <div className="overflow-x-auto rounded-xl border border-zinc-800">
         <table className="w-full text-sm">
-          <thead className="bg-slate-900 text-xs uppercase text-slate-400">
+          <thead className="bg-zinc-900 text-xs uppercase text-zinc-400">
             <tr>
               <th className="px-3 py-2 text-left">Local de votação</th>
               <th className="px-3 py-2 text-left">Bairro</th>
@@ -244,14 +244,14 @@ export default function LocaisTab() {
                 <tr
                   key={k}
                   onClick={() => setLocalSel(localSel === k ? "" : k)}
-                  className={`cursor-pointer border-t border-slate-800 hover:bg-slate-900/60 ${
-                    localSel === k ? "bg-slate-800/50" : ""
+                  className={`cursor-pointer border-t border-zinc-800 hover:bg-zinc-900/60 ${
+                    localSel === k ? "bg-zinc-800/50" : ""
                   }`}
                 >
-                  <td className="px-3 py-2 font-medium text-slate-100">
-                    {nome} <span className="text-slate-500">· Zona {zona}</span>
+                  <td className="px-3 py-2 font-medium text-zinc-100">
+                    {nome} <span className="text-zinc-500">· Zona {zona}</span>
                   </td>
-                  <td className="px-3 py-2 text-slate-300">{bairro}</td>
+                  <td className="px-3 py-2 text-zinc-300">{bairro}</td>
                   <td className="px-3 py-2">{aptosTxt}</td>
                   <td className="px-3 py-2">{abstTxt}</td>
                   {vencedorCell(l26, data)}

@@ -40,13 +40,13 @@ export default function Home() {
     );
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-200">
+    <main className="min-h-screen bg-zinc-950 text-zinc-200">
       <div className="mx-auto max-w-[1440px] px-4 py-8">
         <header className="mb-6">
-          <h1 className="text-3xl font-bold text-slate-50">
+          <h1 className="text-3xl font-bold text-zinc-50">
             Votação em Santa Catarina — {data.meta.ano} · {data.meta.turno}º turno
           </h1>
-          <p className="mt-1 text-sm text-slate-400">
+          <p className="mt-1 text-sm text-zinc-400">
             {data.meta.eleicao} · Fonte: boletins de urna oficiais do TSE ({data.meta.geradoEm})
             · {fmt(data.municipalities.length)} municípios · {data.zonas.length} zonas · dados
             processados localmente
@@ -60,8 +60,8 @@ export default function Home() {
               onClick={() => vaiPara(t.id)}
               className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
                 tab === t.id
-                  ? "bg-blue-600 text-white"
-                  : "bg-slate-900 text-slate-300 hover:bg-slate-800"
+                  ? "bg-zinc-100 text-zinc-900"
+                  : "bg-zinc-900 text-zinc-300 hover:bg-zinc-800"
               }`}
             >
               {t.label}
@@ -78,7 +78,7 @@ export default function Home() {
         {painel("socio", <SocioeconomicoTab />)}
         {painel("vulnerabilidade", <VulnerabilidadeTab />)}
 
-        <footer className="mt-10 border-t border-slate-800 pt-4 text-xs text-slate-500">
+        <footer className="mt-10 border-t border-zinc-800 pt-4 text-xs text-zinc-500">
           Dados oficiais de boletins de urna (arquivo bweb_1t_SC_051020261403, TSE). Este
           painel é uma visualização independente e não substitui a totalização oficial da
           Justiça Eleitoral.

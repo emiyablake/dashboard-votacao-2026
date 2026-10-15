@@ -40,7 +40,7 @@ export default function BairrosTab() {
   }, [bairrosDoMun, bairrosDoMun22]);
 
   const vencedorCell = (b: Bairro | undefined, ds: typeof data) => {
-    if (!b) return <td className="px-3 py-2 text-slate-600">—</td>;
+    if (!b) return <td className="px-3 py-2 text-zinc-600">—</td>;
     const w = winnerInOf(ds, b.votos, 1);
     return (
       <td className="px-3 py-2">
@@ -104,7 +104,7 @@ export default function BairrosTab() {
           placeholder="Buscar município…"
           width="w-72"
         />
-        <span className="text-xs text-slate-400">{linhas.length} bairros</span>
+        <span className="text-xs text-zinc-400">{linhas.length} bairros</span>
         <div className="ml-auto">
           <ExportMenu getDados={dadosBairros} />
         </div>
@@ -121,9 +121,9 @@ export default function BairrosTab() {
         />
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-slate-800">
+      <div className="overflow-x-auto rounded-xl border border-zinc-800">
         <table className="w-full text-sm">
-          <thead className="bg-slate-900 text-xs uppercase text-slate-400">
+          <thead className="bg-zinc-900 text-xs uppercase text-zinc-400">
             <tr>
               <th className="px-3 py-2 text-left">Bairro</th>
               <th className="px-3 py-2 text-left">Aptos 26/22</th>
@@ -149,8 +149,8 @@ export default function BairrosTab() {
               const num1 = (n: number | null | undefined) =>
                 n == null ? "—" : n.toFixed(1);
               return (
-                <tr key={k} className="border-t border-slate-800 hover:bg-slate-900/60">
-                  <td className="px-3 py-2 font-medium text-slate-100">{k}</td>
+                <tr key={k} className="border-t border-zinc-800 hover:bg-zinc-900/60">
+                  <td className="px-3 py-2 font-medium text-zinc-100">{k}</td>
                   <td className="px-3 py-2">{aptosTxt}</td>
                   <td className="px-3 py-2">{abstTxt}</td>
                   {vencedorCell(b26, data)}
@@ -171,7 +171,7 @@ export default function BairrosTab() {
         </table>
       </div>
 
-      <p className="text-xs text-slate-500">
+      <p className="text-xs text-zinc-500">
         Colunas &quot;Censo&quot;: Censo Demográfico 2022 (IBGE), associado por cruzamento
         espacial ao bairro oficial onde a maioria das seções do bairro eleitoral vota. Só
         municípios com bairros oficiais cadastrados no IBGE possuem dados; os demais aparecem

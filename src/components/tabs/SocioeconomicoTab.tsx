@@ -138,12 +138,12 @@ export default function SocioeconomicoTab() {
         {munSel && (
           <button
             onClick={() => setMunSel("")}
-            className="rounded-lg bg-slate-900 px-3 py-2 text-sm text-slate-300 hover:bg-slate-800"
+            className="rounded-lg bg-zinc-900 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800"
           >
             Limpar filtro
           </button>
         )}
-        <span className="text-xs text-slate-400">
+        <span className="text-xs text-zinc-400">
           {filtradas.length} município{filtradas.length === 1 ? "" : "s"} · Censo Demográfico
           2022 (IBGE) · RAIS 2024/2025 (MTE)
         </span>
@@ -152,9 +152,9 @@ export default function SocioeconomicoTab() {
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-slate-800">
+      <div className="overflow-x-auto rounded-xl border border-zinc-800">
         <table className="w-full text-sm">
-          <thead className="bg-slate-900 text-xs uppercase text-slate-400">
+          <thead className="bg-zinc-900 text-xs uppercase text-zinc-400">
             <tr>
               <th className="px-3 py-2 text-left">Município</th>
               <th className="px-3 py-2 text-left">Abstenção 2026</th>
@@ -176,10 +176,10 @@ export default function SocioeconomicoTab() {
             {filtradas.map((l) => {
               const varV = l.variacao_vinculos_24_25;
               return (
-                <tr key={l.ibge} className="border-t border-slate-800 hover:bg-slate-900/60">
-                  <td className="px-3 py-2 font-medium text-slate-100">
+                <tr key={l.ibge} className="border-t border-zinc-800 hover:bg-zinc-900/60">
+                  <td className="px-3 py-2 font-medium text-zinc-100">
                     {l.nome}
-                    <span className="ml-1 text-xs text-slate-500">{l.ibge}</span>
+                    <span className="ml-1 text-xs text-zinc-500">{l.ibge}</span>
                   </td>
                   <td className="px-3 py-2">
                     {l.aptos26 && l.abst26 != null ? `${pct(l.abst26, l.aptos26).toFixed(1)}%` : "—"}
@@ -194,7 +194,7 @@ export default function SocioeconomicoTab() {
                   <td className="px-3 py-2">{num1(l.pct_esgoto_rede)}%</td>
                   <td className="px-3 py-2">
                     {l.rais_2025 ? fmt(l.rais_2025.vinculos) : "—"}
-                    <span className="text-slate-500">
+                    <span className="text-zinc-500">
                       {" / "}
                       {l.rais_2024 ? fmt(l.rais_2024.vinculos) : "—"}
                     </span>

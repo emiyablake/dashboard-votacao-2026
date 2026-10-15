@@ -169,7 +169,7 @@ export const PARTIDO_COLORS: Record<string, string> = {
   UNIÃO: "#3b82f6",
   PDT: "#e11d48",
   MDB: "#14b8a6",
-  REPUBLICANOS: "#64748b",
+  REPUBLICANOS: "#71717a",
   PSDB: "#0ea5e9",
   PSOL: "#f43f5e",
   PODE: "#84cc16",
@@ -186,12 +186,12 @@ export const PARTIDO_COLORS: Record<string, string> = {
   MOBILIZA: "#4ade80",
   RENOVAÇÃO: "#22d3ee",
   PTC: "#facc15",
-  PSN: "#94a3b8",
+  PSN: "#a1a1aa",
   PMB: "#fda4af",
 };
 
 export function partidoColor(sigla: string | null | undefined): string {
-  if (!sigla) return "#94a3b8";
+  if (!sigla) return "#a1a1aa";
   const base = sigla.replace(/\s*\(.*\)/, "").trim().toUpperCase();
-  return PARTIDO_COLORS[base] ?? "#94a3b8";
+  return PARTIDO_COLORS[base] ?? "#a1a1aa";
 }

@@ -84,12 +84,12 @@ export default function ComboBox({
             setOpen(false);
           }
         }}
-        className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-slate-500"
+        className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm outline-none focus:border-zinc-500"
       />
       {open && (
-        <ul className="absolute z-30 mt-1 max-h-64 w-full overflow-auto rounded-lg border border-slate-700 bg-slate-900 py-1 shadow-xl">
+        <ul className="absolute z-30 mt-1 max-h-64 w-full overflow-auto rounded-lg border border-zinc-700 bg-zinc-900 py-1 shadow-xl">
           {filtradas.length === 0 && (
-            <li className="px-3 py-2 text-sm text-slate-500">Nenhum resultado</li>
+            <li className="px-3 py-2 text-sm text-zinc-500">Nenhum resultado</li>
           )}
           {filtradas.map((o, i) => (
             <li
@@ -101,8 +101,8 @@ export default function ComboBox({
               onMouseEnter={() => setHighlight(i)}
               className={`cursor-pointer px-3 py-2 text-sm ${
                 i === highlight
-                  ? "bg-blue-600 text-white"
-                  : "text-slate-200 hover:bg-slate-800"
+                  ? "bg-zinc-100 text-zinc-900"
+                  : "text-zinc-200 hover:bg-zinc-800"
               }`}
             >
               {o.label}

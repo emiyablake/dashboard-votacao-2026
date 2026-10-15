@@ -33,7 +33,7 @@ export default function MapaCoropletico({
   const style = (feature: any) => {
     const cod = Number(feature?.properties?.codarea);
     const mun = porCod.get(cod);
-    let fill = "#1e293b";
+    let fill = "#27272a";
     if (mun) {
       if (metrica === "vencedor") {
         const w = winnerIn(mun.votos, 1);
@@ -43,7 +43,7 @@ export default function MapaCoropletico({
         fill = corAbstencao(pct(base, mun.aptos));
       }
     }
-    return { fillColor: fill, fillOpacity: 0.75, color: "#0f172a", weight: 1 };
+    return { fillColor: fill, fillOpacity: 0.75, color: "#18181b", weight: 1 };
   };
 
   const onEach = (feature: any, layer: any) => {
@@ -71,15 +71,15 @@ export default function MapaCoropletico({
             onClick={() => setMetrica(mtr.id)}
             className={`rounded-lg border px-3 py-1.5 text-xs ${
               metrica === mtr.id
-                ? "border-slate-500 bg-slate-700 text-slate-100"
-                : "border-slate-700 bg-slate-900 text-slate-400 hover:text-slate-200"
+                ? "border-zinc-500 bg-zinc-700 text-zinc-100"
+                : "border-zinc-700 bg-zinc-900 text-zinc-400 hover:text-zinc-200"
             }`}
           >
             {mtr.label}
           </button>
         ))}
         {metrica !== "vencedor" ? (
-          <span className="ml-auto flex items-center gap-3 text-xs text-slate-400">
+          <span className="ml-auto flex items-center gap-3 text-xs text-zinc-400">
             <span className="inline-flex items-center gap-1">
               <span className="inline-block h-3 w-3 rounded-sm bg-green-400" /> &lt;16%
             </span>
@@ -94,7 +94,7 @@ export default function MapaCoropletico({
             </span>
           </span>
         ) : (
-          <span className="ml-auto flex items-center gap-3 text-xs text-slate-400">
+          <span className="ml-auto flex items-center gap-3 text-xs text-zinc-400">
             <span className="inline-flex items-center gap-1">
               <span className="inline-block h-3 w-3 rounded-sm bg-blue-700" /> PL
             </span>
@@ -110,7 +110,7 @@ export default function MapaCoropletico({
         minZoom={6}
         maxZoom={12}
         scrollWheelZoom
-        className="h-[560px] w-full rounded-xl border border-slate-700"
+        className="h-[560px] w-full rounded-xl border border-zinc-700"
         style={{ background: "#0b1220" }}
       >
         <TileLayer attribution={TILE_ATTRIBUTION} url={TILE_URL} />

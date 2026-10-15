@@ -6,10 +6,10 @@ import { DadosExport, downloadCSV, downloadPDF, downloadXML } from "@/lib/downlo
 /** card de KPI usado nas abas */
 export function Card({ title, value, sub }: { title: string; value: string; sub?: string }) {
   return (
-    <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-4">
-      <div className="text-xs uppercase tracking-wide text-slate-400">{title}</div>
-      <div className="mt-1 text-2xl font-semibold text-slate-50">{value}</div>
-      {sub && <div className="mt-1 text-xs text-slate-400">{sub}</div>}
+    <div className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-4">
+      <div className="text-xs uppercase tracking-wide text-zinc-400">{title}</div>
+      <div className="mt-1 text-2xl font-semibold text-zinc-50">{value}</div>
+      {sub && <div className="mt-1 text-xs text-zinc-400">{sub}</div>}
     </div>
   );
 }
@@ -27,9 +27,9 @@ export function ChartPanel({
   acao?: ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-4">
-      <h3 className="mb-1 font-semibold text-slate-100">{titulo}</h3>
-      {descricao && <p className="mb-3 text-xs text-slate-400">{descricao}</p>}
+    <div className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-4">
+      <h3 className="mb-1 font-semibold text-zinc-100">{titulo}</h3>
+      {descricao && <p className="mb-3 text-xs text-zinc-400">{descricao}</p>}
       {acao}
       {children}
     </div>
@@ -86,7 +86,7 @@ export function ExportMenu({ getDados }: { getDados: () => DadosExport }) {
         type="button"
         onClick={() => setAberto((v) => !v)}
         disabled={gerando}
-        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs font-medium text-slate-200 transition-colors hover:border-slate-500 hover:bg-slate-700 disabled:opacity-60"
+        className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-700 bg-zinc-800/80 px-3 py-2 text-xs font-medium text-zinc-200 transition-colors hover:border-zinc-500 hover:bg-zinc-700 disabled:opacity-60"
       >
         <svg
           width="14"
@@ -120,16 +120,16 @@ export function ExportMenu({ getDados }: { getDados: () => DadosExport }) {
         </svg>
       </button>
       {aberto && (
-        <div className="absolute right-0 z-30 mt-1 w-56 overflow-hidden rounded-lg border border-slate-700 bg-slate-900 shadow-xl">
+        <div className="absolute right-0 z-30 mt-1 w-56 overflow-hidden rounded-lg border border-zinc-700 bg-zinc-900 shadow-xl">
           {FORMATOS.map((f) => (
             <button
               key={f.id}
               type="button"
               onClick={() => escolher(f.id)}
-              className="block w-full px-3 py-2 text-left text-slate-200 transition-colors hover:bg-slate-800"
+              className="block w-full px-3 py-2 text-left text-zinc-200 transition-colors hover:bg-zinc-800"
             >
               <span className="text-xs font-semibold">{f.rotulo}</span>
-              <span className="block text-[11px] text-slate-400">{f.dica}</span>
+              <span className="block text-[11px] text-zinc-400">{f.dica}</span>
             </button>
           ))}
         </div>
@@ -138,16 +138,16 @@ export function ExportMenu({ getDados }: { getDados: () => DadosExport }) {
   );
 }
 
-export const axisStyle = { fill: "#94a3b8", fontSize: 12 };
+export const axisStyle = { fill: "#a1a1aa", fontSize: 12 };
 
 export const tooltipProps = {
   contentStyle: {
-    backgroundColor: "#0f172a",
-    border: "1px solid #334155",
+    backgroundColor: "#18181b",
+    border: "1px solid #3f3f46",
     borderRadius: 8,
   },
-  labelStyle: { color: "#e2e8f0", fontSize: 13 },
-  itemStyle: { color: "#e2e8f0", fontSize: 13 },
+  labelStyle: { color: "#e4e4e7", fontSize: 13 },
+  itemStyle: { color: "#e4e4e7", fontSize: 13 },
 };
 
 /** escala de cores compartilhada para taxas de abstencao/comparecimento */

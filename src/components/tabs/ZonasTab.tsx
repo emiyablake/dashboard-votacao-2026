@@ -48,7 +48,7 @@ export default function ZonasTab() {
       >
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={topAbst}>
-            <CartesianGrid stroke="#1e293b" vertical={false} />
+            <CartesianGrid stroke="#27272a" vertical={false} />
             <XAxis dataKey="zona" tick={axisStyle} />
             <YAxis tick={axisStyle} unit="%" />
             <Tooltip
@@ -67,9 +67,9 @@ export default function ZonasTab() {
         </ResponsiveContainer>
       </ChartPanel>
 
-      <div className="overflow-x-auto rounded-xl border border-slate-800">
+      <div className="overflow-x-auto rounded-xl border border-zinc-800">
         <table className="w-full text-sm">
-          <thead className="bg-slate-900 text-xs uppercase text-slate-400">
+          <thead className="bg-zinc-900 text-xs uppercase text-zinc-400">
             <tr>
               <th className="px-3 py-2 text-left">Zona</th>
               <th className="px-3 py-2 text-left">Municípios atendidos</th>
@@ -83,18 +83,18 @@ export default function ZonasTab() {
             {[...data.zonas]
               .sort((a, b) => b.aptos - a.aptos)
               .map((z) => (
-                <tr key={z.zona} className="border-t border-slate-800 hover:bg-slate-900/60">
-                  <td className="px-3 py-2 font-medium text-slate-100">{z.zona}</td>
-                  <td className="px-3 py-2 text-slate-300">{z.muns.join(", ")}</td>
+                <tr key={z.zona} className="border-t border-zinc-800 hover:bg-zinc-900/60">
+                  <td className="px-3 py-2 font-medium text-zinc-100">{z.zona}</td>
+                  <td className="px-3 py-2 text-zinc-300">{z.muns.join(", ")}</td>
                   <td className="px-3 py-2">{fmt(z.secoes)}</td>
                   <td className="px-3 py-2">{fmt(z.aptos)}</td>
                   <td className="px-3 py-2">
                     {fmt(z.comp)}{" "}
-                    <span className="text-slate-500">({pct(z.comp, z.aptos).toFixed(1)}%)</span>
+                    <span className="text-zinc-500">({pct(z.comp, z.aptos).toFixed(1)}%)</span>
                   </td>
                   <td className="px-3 py-2">
                     {fmt(z.abst)}{" "}
-                    <span className="text-slate-500">({pct(z.abst, z.aptos).toFixed(1)}%)</span>
+                    <span className="text-zinc-500">({pct(z.abst, z.aptos).toFixed(1)}%)</span>
                   </td>
                 </tr>
               ))}

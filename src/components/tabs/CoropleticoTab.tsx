@@ -34,7 +34,7 @@ export default function CoropleticoTab() {
       <div className="flex justify-end">
         <ExportMenu getDados={dadosMunicipios} />
       </div>
-      <p className="text-xs text-slate-400">
+      <p className="text-xs text-zinc-400">
         Mapa coroplético por município. Escolha a métrica acima do mapa: abstenção,
         comparecimento ou vencedor para Presidente. Passe o mouse sobre o município para
         ver os números completos.

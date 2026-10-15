@@ -58,7 +58,7 @@ export default function MapaAbstencao({
       minZoom={6}
       maxZoom={12}
       scrollWheelZoom
-      className="h-[560px] w-full rounded-xl border border-slate-700"
+      className="h-[560px] w-full rounded-xl border border-zinc-700"
       style={{ background: "#0b1220" }}
     >
       <TileLayer attribution={TILE_ATTRIBUTION} url={TILE_URL} />

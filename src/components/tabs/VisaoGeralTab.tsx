@@ -37,7 +37,7 @@ export default function VisaoGeralTab() {
     <ChartPanel titulo={titulo}>
       <ResponsiveContainer width="100%" height={height}>
         <BarChart data={rows} layout="vertical">
-          <CartesianGrid stroke="#1e293b" horizontal={false} />
+          <CartesianGrid stroke="#27272a" horizontal={false} />
           <XAxis type="number" tick={axisStyle} tickFormatter={(v) => fmt(v)} />
           <YAxis type="category" dataKey="nome" width={170} tick={axisStyle} />
           <Tooltip {...tooltipProps} formatter={(v) => [fmt(Number(v)), "votos"]} />
@@ -97,7 +97,7 @@ export default function VisaoGeralTab() {
         <ChartPanel titulo="Composição dos votos por cargo">
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={composicaoCargos}>
-              <CartesianGrid stroke="#1e293b" vertical={false} />
+              <CartesianGrid stroke="#27272a" vertical={false} />
               <XAxis dataKey="cargo" tick={axisStyle} />
               <YAxis tick={axisStyle} tickFormatter={(v) => fmt(v)} />
               <Tooltip {...tooltipProps} formatter={(v) => fmt(Number(v))} />
@@ -107,7 +107,7 @@ export default function VisaoGeralTab() {
               <Bar dataKey="Nulos" stackId="a" fill="#ef4444" />
             </BarChart>
           </ResponsiveContainer>
-          <p className="mt-1 text-xs text-slate-500">
+          <p className="mt-1 text-xs text-zinc-500">
             Senador soma o dobro porque cada eleitor escolhe 2 candidatos (voto duplo).
           </p>
         </ChartPanel>
@@ -118,7 +118,7 @@ export default function VisaoGeralTab() {
       <ChartPanel titulo="Deputado Federal — candidatos mais votados (top 12)">
         <ResponsiveContainer width="100%" height={380}>
           <BarChart data={depFedRanking} layout="vertical" margin={{ left: 12 }}>
-            <CartesianGrid stroke="#1e293b" horizontal={false} />
+            <CartesianGrid stroke="#27272a" horizontal={false} />
             <XAxis type="number" tick={axisStyle} tickFormatter={(v) => fmt(v)} />
             <YAxis type="category" dataKey="nome" width={190} tick={axisStyle} />
             <Tooltip {...tooltipProps} formatter={(v) => [fmt(Number(v)), "votos"]} />

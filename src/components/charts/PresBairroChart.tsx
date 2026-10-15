@@ -26,18 +26,18 @@ export default function PresBairroChart({
   larguraLabel?: number;
 }) {
   return (
-    <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-4">
-      <h3 className="mb-1 font-semibold text-slate-100">{titulo}</h3>
-      <p className="mb-3 text-xs text-slate-400">
+    <div className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-4">
+      <h3 className="mb-1 font-semibold text-zinc-100">{titulo}</h3>
+      <p className="mb-3 text-xs text-zinc-400">
         Top 15 bairros por aptos · a soma das barras equivale ao eleitorado apto do bairro.
       </p>
-      <div className="mb-3 flex flex-wrap items-center gap-3 text-xs text-slate-300">
+      <div className="mb-3 flex flex-wrap items-center gap-3 text-xs text-zinc-300">
         <span className="inline-flex items-center gap-1.5">
           <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ background: dados[0]?.cor1 ?? "#4ade80" }} />
           {dados[0]?.nome1 ?? "1º lugar"}
         </span>
         <span className="inline-flex items-center gap-1.5">
-          <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ background: dados[0]?.cor2 ?? "#38bdf8" }} />
+          <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ background: dados[0]?.cor2 ?? "#a1a1aa" }} />
           {dados[0]?.nome2 ?? "2º lugar"}
         </span>
         <span className="inline-flex items-center gap-1.5">
@@ -49,13 +49,13 @@ export default function PresBairroChart({
           Brancos/Nulos
         </span>
         <span className="inline-flex items-center gap-1.5">
-          <span className="inline-block h-2.5 w-2.5 rounded-sm bg-slate-600" />
+          <span className="inline-block h-2.5 w-2.5 rounded-sm bg-zinc-600" />
           Abstenção
         </span>
       </div>
       <ResponsiveContainer width="100%" height={altura}>
         <BarChart data={dados} layout="vertical" barCategoryGap="20%">
-          <CartesianGrid stroke="#1e293b" horizontal={false} />
+          <CartesianGrid stroke="#27272a" horizontal={false} />
           <XAxis type="number" tick={axisStyle} tickFormatter={(v) => fmt(v)} />
           <YAxis
             type="category"
@@ -81,10 +81,10 @@ export default function PresBairroChart({
             }}
           />
           <Bar dataKey="lider1" name="lider1" stackId="a" fill={dados[0]?.cor1 ?? "#4ade80"} />
-          <Bar dataKey="lider2" name="lider2" stackId="a" fill={dados[0]?.cor2 ?? "#38bdf8"} />
+          <Bar dataKey="lider2" name="lider2" stackId="a" fill={dados[0]?.cor2 ?? "#a1a1aa"} />
           <Bar dataKey="outros" name="outros" stackId="a" fill="#f97316" />
           <Bar dataKey="brancosNulos" name="brancosNulos" stackId="a" fill="#ededed" />
-          <Bar dataKey="abstencao" name="abstencao" stackId="a" fill="#475569" radius={[0, 4, 4, 0]} />
+          <Bar dataKey="abstencao" name="abstencao" stackId="a" fill="#52525b" radius={[0, 4, 4, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>

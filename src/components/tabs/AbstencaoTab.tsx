@@ -106,7 +106,7 @@ export default function AbstencaoTab() {
       >
         <ResponsiveContainer width="100%" height={320}>
           <ComposedChart data={pareto.slice(0, 25)}>
-            <CartesianGrid stroke="#1e293b" vertical={false} />
+            <CartesianGrid stroke="#27272a" vertical={false} />
             <XAxis dataKey="zona" tick={axisStyle} angle={-45} textAnchor="end" height={70} />
             <YAxis yAxisId="abs" tick={axisStyle} tickFormatter={(v) => fmt(v)} />
             <YAxis yAxisId="pct" orientation="right" tick={axisStyle} unit="%" domain={[0, 100]} />
@@ -124,7 +124,7 @@ export default function AbstencaoTab() {
             />
             <Legend />
             <Bar yAxisId="abs" dataKey="abst" name="abstenções" fill="#f59e0b" radius={[4, 4, 0, 0]} />
-            <Line yAxisId="pct" type="monotone" dataKey="acum" name="% acumulado" stroke="#38bdf8" strokeWidth={2} dot={false} />
+            <Line yAxisId="pct" type="monotone" dataKey="acum" name="% acumulado" stroke="#a1a1aa" strokeWidth={2} dot={false} />
           </ComposedChart>
         </ResponsiveContainer>
       </ChartPanel>
@@ -135,7 +135,7 @@ export default function AbstencaoTab() {
       >
         <ResponsiveContainer width="100%" height={380}>
           <ScatterChart margin={{ top: 10, right: 30, bottom: 10, left: 10 }}>
-            <CartesianGrid stroke="#1e293b" />
+            <CartesianGrid stroke="#27272a" />
             <XAxis
               type="number"
               dataKey="x"
@@ -146,7 +146,7 @@ export default function AbstencaoTab() {
                 value: "eleitores aptos",
                 position: "insideBottom",
                 offset: -5,
-                fill: "#94a3b8",
+                fill: "#a1a1aa",
                 fontSize: 12,
               }}
             />
@@ -170,7 +170,7 @@ export default function AbstencaoTab() {
                 return p ? `${p.zona} — ${p.muns}` : "";
               }}
             />
-            <Scatter data={scatter} fill="#38bdf8" fillOpacity={0.6} />
+            <Scatter data={scatter} fill="#a1a1aa" fillOpacity={0.6} />
           </ScatterChart>
         </ResponsiveContainer>
       </ChartPanel>

@@ -173,7 +173,7 @@ export default function VulnerabilidadeTab() {
         <select
           value={idX}
           onChange={(e) => setIdX(e.target.value as IdIndicador)}
-          className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm"
+          className="rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm"
         >
           {INDICADORES.map((i) => (
             <option key={i.id} value={i.id}>
@@ -184,7 +184,7 @@ export default function VulnerabilidadeTab() {
         <select
           value={anoAbst}
           onChange={(e) => setAnoAbst(e.target.value as "2026" | "2022")}
-          className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm"
+          className="rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm"
         >
           <option value="2026">Abstenção: {data.meta.ano}</option>
           <option value="2022">Abstenção: {data2022.meta.ano}</option>
@@ -192,14 +192,14 @@ export default function VulnerabilidadeTab() {
         <select
           value={ordenarPor}
           onChange={(e) => setOrdenarPor(e.target.value as "indicador" | "abstencao")}
-          className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm"
+          className="rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm"
         >
           <option value="indicador">
             Ordenar por: indicador{indicadorX.invertido ? " (menor = mais vulnerável)" : ""}
           </option>
           <option value="abstencao">Ordenar por: abstenção</option>
         </select>
-        <span className="text-xs text-slate-400">
+        <span className="text-xs text-zinc-400">
           {rows.length} bairros · exibindo top {Math.min(TOP_N, rows.length)}
         </span>
         <div className="ml-auto">
@@ -219,16 +219,16 @@ export default function VulnerabilidadeTab() {
         }
       >
         {top.length === 0 ? (
-          <p className="py-16 text-center text-sm text-slate-500">
+          <p className="py-16 text-center text-sm text-zinc-500">
             Nenhum bairro encontrado com os filtros atuais.
           </p>
         ) : (
           <ResponsiveContainer width="100%" height={520}>
             <ComposedChart data={top} margin={{ top: 10, right: 10, bottom: 10, left: 0 }}>
-              <CartesianGrid stroke="#1e293b" />
+              <CartesianGrid stroke="#27272a" />
               <XAxis
                 dataKey="rotulo"
-                tick={{ fill: "#94a3b8", fontSize: 11 }}
+                tick={{ fill: "#a1a1aa", fontSize: 11 }}
                 tickFormatter={truncarRotulo}
                 angle={-35}
                 textAnchor="end"
@@ -253,30 +253,30 @@ export default function VulnerabilidadeTab() {
                   if (!active || !payload?.length) return null;
                   const p = payload[0].payload as Registro;
                   return (
-                    <div className="rounded-lg border border-slate-700 bg-slate-900/95 px-3 py-2 text-xs shadow-xl">
-                      <p className="mb-1 font-semibold text-slate-100">
-                        {p.bairro} <span className="font-normal text-slate-400">· {p.municipio}</span>
+                    <div className="rounded-lg border border-zinc-700 bg-zinc-900/95 px-3 py-2 text-xs shadow-xl">
+                      <p className="mb-1 font-semibold text-zinc-100">
+                        {p.bairro} <span className="font-normal text-zinc-400">· {p.municipio}</span>
                       </p>
-                      <p className="text-slate-300">
+                      <p className="text-zinc-300">
                         {indicadorX.nome}: <b>{fmtIndicador(p.indicador)}</b>
                       </p>
-                      <p className="text-slate-300">
+                      <p className="text-zinc-300">
                         {nomeAbst}: <b>{p.abstencao.toFixed(1)}%</b>
                       </p>
-                      {p.aptos > 0 && <p className="text-slate-400">aptos 2026: {fmt(p.aptos)}</p>}
+                      {p.aptos > 0 && <p className="text-zinc-400">aptos 2026: {fmt(p.aptos)}</p>}
                       {p.cobertura != null && (
-                        <p className="text-slate-500">cobertura do cruzamento: {p.cobertura}%</p>
+                        <p className="text-zinc-500">cobertura do cruzamento: {p.cobertura}%</p>
                       )}
                     </div>
                   );
                 }}
               />
-              <Legend wrapperStyle={{ fontSize: 12, color: "#94a3b8" }} />
+              <Legend wrapperStyle={{ fontSize: 12, color: "#a1a1aa" }} />
               <Bar
                 yAxisId="ind"
                 dataKey="indicador"
                 name={indicadorX.nome}
-                fill="#38bdf8"
+                fill="#d4d4d8"
                 radius={[3, 3, 0, 0]}
                 isAnimationActive={false}
                 maxBarSize={30}
@@ -295,7 +295,7 @@ export default function VulnerabilidadeTab() {
         )}
       </ChartPanel>
 
-      <p className="text-xs text-slate-500">
+      <p className="text-xs text-zinc-500">
         Fontes: Censo Demográfico 2022 (IBGE) por bairro oficial, associado aos bairros eleitorais por
         cruzamento espacial; votação e abstenções de boletins de urna (TSE). Aparecem apenas bairros
         de municípios com bairros oficiais cadastrados no IBGE. A correlação não implica causalidade.
