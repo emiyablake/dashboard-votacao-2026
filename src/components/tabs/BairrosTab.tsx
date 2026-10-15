@@ -130,11 +130,6 @@ export default function BairrosTab() {
               <th className="px-3 py-2 text-left">Abstenção 26/22</th>
               <th className="px-3 py-2 text-left">Vencedor {data.meta.ano}</th>
               <th className="px-3 py-2 text-left">Vencedor {data2022.meta.ano}</th>
-              <th className="px-3 py-2 text-left">Pop. Censo</th>
-              <th className="px-3 py-2 text-left">Densid.</th>
-              <th className="px-3 py-2 text-left">60+</th>
-              <th className="px-3 py-2 text-left">Alfabet. 15+</th>
-              <th className="px-3 py-2 text-left">Esgoto</th>
             </tr>
           </thead>
           <tbody>
@@ -145,9 +140,6 @@ export default function BairrosTab() {
               const abstTxt = [b26, b22]
                 .map((b) => (b ? `${pct(b.abst, b.aptos).toFixed(1)}%` : "—"))
                 .join(" / ");
-              const socio = socioPorBairro(munBairro, k);
-              const num1 = (n: number | null | undefined) =>
-                n == null ? "—" : n.toFixed(1);
               return (
                 <tr key={k} className="border-t border-zinc-800 hover:bg-zinc-900/60">
                   <td className="px-3 py-2 font-medium text-zinc-100">{k}</td>
@@ -155,28 +147,12 @@ export default function BairrosTab() {
                   <td className="px-3 py-2">{abstTxt}</td>
                   {vencedorCell(b26, data)}
                   {vencedorCell(b22, data2022)}
-                  <td className="px-3 py-2" title={socio?.bairro_ibge ? `Bairro IBGE de referência: ${socio.bairro_ibge}` : undefined}>
-                    {socio?.populacao != null ? fmt(socio.populacao) : "—"}
-                  </td>
-                  <td className="px-3 py-2">
-                    {socio?.densidade != null ? `${num1(socio.densidade)}/km²` : "—"}
-                  </td>
-                  <td className="px-3 py-2">{num1(socio?.pct_60_mais)}%</td>
-                  <td className="px-3 py-2">{num1(socio?.pct_alfabetizadas_15)}%</td>
-                  <td className="px-3 py-2">{num1(socio?.pct_esgoto_rede)}%</td>
                 </tr>
               );
             })}
           </tbody>
         </table>
       </div>
-
-      <p className="text-xs text-zinc-500">
-        Colunas &quot;Censo&quot;: Censo Demográfico 2022 (IBGE), associado por cruzamento
-        espacial ao bairro oficial onde a maioria das seções do bairro eleitoral vota. Só
-        municípios com bairros oficiais cadastrados no IBGE possuem dados; os demais aparecem
-        com &quot;—&quot;.
-      </p>
     </div>
   );
 }
