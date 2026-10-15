@@ -3,27 +3,21 @@
 import { useState } from "react";
 import VisaoGeralTab from "@/components/tabs/VisaoGeralTab";
 import ZonasTab from "@/components/tabs/ZonasTab";
-import AbstencaoTab from "@/components/tabs/AbstencaoTab";
 import BairrosTab from "@/components/tabs/BairrosTab";
 import LocaisTab from "@/components/tabs/LocaisTab";
-import CoropleticoTab from "@/components/tabs/CoropleticoTab";
 import SocioeconomicoTab from "@/components/tabs/SocioeconomicoTab";
-import VulnerabilidadeTab from "@/components/tabs/VulnerabilidadeTab";
 import TerritorioTab from "@/components/tabs/TerritorioTab";
 import OcupacoesTab from "@/components/tabs/OcupacoesTab";
 import { data, fmt } from "@/lib/data";
 
-type Tab = "geral" | "bairros" | "locais" | "zonas" | "abstencao" | "coropletico" | "socio" | "vulnerabilidade" | "territorio" | "ocupacoes";
+type Tab = "geral" | "bairros" | "locais" | "zonas" | "socio" | "territorio" | "ocupacoes";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "geral", label: "Visão geral" },
   { id: "bairros", label: "Bairros" },
   { id: "locais", label: "Locais de votação" },
   { id: "zonas", label: "Zonas eleitorais" },
-  { id: "abstencao", label: "Abstenções" },
-  { id: "coropletico", label: "Mapa coroplético" },
   { id: "socio", label: "Socioeconômico" },
-  { id: "vulnerabilidade", label: "Vulnerabilidade" },
   { id: "territorio", label: "Território" },
   { id: "ocupacoes", label: "Ocupações" },
 ];
@@ -77,10 +71,7 @@ export default function Home() {
         {painel("bairros", <BairrosTab />)}
         {painel("locais", <LocaisTab />)}
         {painel("zonas", <ZonasTab />)}
-        {painel("abstencao", <AbstencaoTab />)}
-        {painel("coropletico", <CoropleticoTab />)}
         {painel("socio", <SocioeconomicoTab />)}
-        {painel("vulnerabilidade", <VulnerabilidadeTab />)}
         {painel("territorio", <TerritorioTab />)}
         {painel("ocupacoes", <OcupacoesTab />)}
 
