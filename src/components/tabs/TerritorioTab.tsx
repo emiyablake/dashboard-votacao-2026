@@ -23,7 +23,8 @@ import {
   winnerInOf,
 } from "@/lib/data";
 import { axisStyle, Card, ChartPanel, ExportMenu } from "@/lib/ui";
-import { EconomiaMun, Municipality, VotacaoData } from "@/types";
+import { GrupoAgg, agregaVoto, paraBarras } from "@/lib/voto";
+import { EconomiaMun } from "@/types";
 
 // mapas Leaflet precisam de ssr desabilitado (window nao existe no servidor)
 const MapaGeografiaEconomica = dynamic(
@@ -76,57 +77,6 @@ function perfilDe(e: EconomiaMun | undefined): Setor | null {
   return best;
 }
 
-interface GrupoAgg {
-  nome: string;
-  muns: number;
-  aptos: number;
-  abst: number;
-  pl: number;
-  pt: number;
-  validos: number;
-}
-
-/** agrega municipios por chave, com votos PL/PT (presidente) e abstenção ponderados */
-function agrega(
-  d: VotacaoData,
-  chave: (m: Municipality) => string
-): Map<string, GrupoAgg> {
-  const cands = new Map(
-    d.candidates
-      .filter((c) => c.cdCargo === 1 && (c.tipo === "Nominal" || c.tipo === "Legenda"))
-      .map((c) => [c.id, c])
-  );
-  const grupos = new Map<string, GrupoAgg>();
-  for (const m of d.municipalities) {
-    const k = chave(m);
-    let g = grupos.get(k);
-    if (!g) {
-      g = { nome: k, muns: 0, aptos: 0, abst: 0, pl: 0, pt: 0, validos: 0 };
-      grupos.set(k, g);
-    }
-    g.muns += 1;
-    g.aptos += m.aptos;
-    g.abst += m.abst;
-    for (const v of m.votos) {
-      if (v.c !== 1) continue;
-      const cand = cands.get(v.v);
-      if (!cand) continue; // brancos/nulos ficam fora do denominador de válidos
-      g.validos += v.n;
-      if (cand.tipo === "Nominal" && cand.partido === "PL") g.pl += v.n;
-      else if (cand.tipo === "Nominal" && cand.partido === "PT") g.pt += v.n;
-    }
-  }
-  return grupos;
-}
-
-const paraBarras = (g: GrupoAgg) => ({
-  nome: g.nome,
-  muns: g.muns,
-  abstencao: Number(pct(g.abst, g.aptos).toFixed(1)),
-  pl: Number(pct(g.pl, g.validos).toFixed(1)),
-  pt: Number(pct(g.pt, g.validos).toFixed(1)),
-});
-
 export default function TerritorioTab() {
   const [ano, setAno] = useState<"2026" | "2022">("2026");
   const [idInd, setIdInd] = useState<IdIndicador>("pct_esgoto_rede");
@@ -142,7 +92,7 @@ export default function TerritorioTab() {
 
   // ---------- bloco 1: geografia economica ----------
   const porPerfil = useMemo(() => {
-    const grupos = agrega(votacao, (m) => perfis.get(m.ibge)?.nome ?? "Sem dados RAIS");
+    const grupos = agregaVoto(votacao, (m) => perfis.get(m.ibge)?.nome ?? "Sem dados RAIS");
     return [...SETORES.map((s) => s.nome), "Sem dados RAIS"]
       .map((nome) => grupos.get(nome))
       .filter((g): g is GrupoAgg => !!g)
@@ -179,7 +129,7 @@ export default function TerritorioTab() {
   const socioPorIbgeMap = useMemo(() => new Map(socio.map((s) => [s.ibge, s])), []);
 
   const porQuartil = useMemo(() => {
-    const grupos = agrega(votacao, (m) => {
+    const grupos = agregaVoto(votacao, (m) => {
       const s = socioPorIbgeMap.get(String(m.ibge));
       const k = quartilDe((s?.[idInd] as number | null) ?? null);
       return k === 0 ? "Sem dados Censo" : rotuloQuartil(k);
@@ -192,7 +142,7 @@ export default function TerritorioTab() {
 
   // ---------- KPIs ----------
   const kpisEco = useMemo(() => {
-    const grupos = agrega(votacao, (m) => perfis.get(m.ibge)?.nome ?? "Sem dados RAIS");
+    const grupos = agregaVoto(votacao, (m) => perfis.get(m.ibge)?.nome ?? "Sem dados RAIS");
     let maior: GrupoAgg | null = null;
     let agro: GrupoAgg | null = null;
     for (const g of grupos.values()) {

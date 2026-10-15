@@ -103,8 +103,7 @@ export function MapaGeografiaEconomica({
   );
 }
 
-/** mapa da infraestrutura: municipios coloridos pela cobertura do indicador (Censo) */
-export function MapaInfraestrutura({
+/** mapa da infraestrutura: municipios coloridos pela cobertura do indicador (Censo) */export function MapaInfraestrutura({
   votacao,
   ano,
   idInd,
@@ -157,6 +156,76 @@ export function MapaInfraestrutura({
                 ? `<p class="tp-det">Sem dados de ${indicadorNome}</p>`
                 : `<p class="tp-linha">${indicadorNome}: <b>${v.toFixed(1)}%</b> dos domicílios</p>`
             ),
+            { className: "tooltip-padrao" }
+          );
+        }}
+      />
+    </MapContainer>
+  );
+}
+
+
+/** mapa de ocupacao: municipios coloridos pela participação da ocupação
+ *  nos vínculos formais locais (share em %) */
+export function MapaOcupacao({
+  votacao,
+  ano,
+  occNome,
+  detalhes,
+}: {
+  votacao: VotacaoData;
+  ano: number;
+  occNome: string;
+  detalhes: Map<number, { n: number; sal: number | null; share: number }>;
+}) {
+  const cor = (p: number) =>
+    p >= 10 ? "#7c3aed" : p >= 5 ? "#8b5cf6" : p >= 2 ? "#a78bfa" : p >= 1 ? "#c4b5fd" : "#ede9fe";
+
+  return (
+    <MapContainer
+      center={[-27.2, -50.5]}
+      zoom={7}
+      minZoom={6}
+      maxZoom={12}
+      scrollWheelZoom
+      className="h-[480px] w-full rounded-xl border border-zinc-700"
+      style={{ background: "#0a0a0a" }}
+    >
+      <TileLayer attribution={TILE_ATTRIBUTION} url={TILE_URL} />
+      <GeoJSON
+        key={occNome + ano}
+        data={geojson as any}
+        style={(f: any) => {
+          const d = detalhes.get(Number(f?.properties?.codarea));
+          return {
+            fillColor: d ? cor(d.share) : SEM_DADOS,
+            fillOpacity: 0.75,
+            color: "#18181b",
+            weight: 1,
+          };
+        }}
+        onEachFeature={(f: any, layer: any) => {
+          const cod = Number(f?.properties?.codarea);
+          const mun = votacao.municipalities.find((m) => m.ibge === cod);
+          if (!mun) return;
+          const d = detalhes.get(cod);
+          const w = winnerInOf(votacao, mun.votos, 1);
+          layer.bindTooltip(
+            [
+              `<p class="tp-titulo">${mun.nome}</p>`,
+              d
+                ? `<p class="tp-linha">${occNome}: <b>${fmt(d.n)}</b> vínculos (${d.share.toFixed(1)}% dos formais)</p>`
+                : `<p class="tp-det">Sem vínculos registrados em ${occNome}</p>`,
+              d?.sal != null
+                ? `<p class="tp-det">salário médio da ocupação: R$ ${fmt(d.sal)}</p>`
+                : "",
+              `<p class="tp-linha">Abstenção: <b>${pct(mun.abst, mun.aptos).toFixed(1)}%</b></p>`,
+              `<p class="tp-linha">Presidente ${ano}: ${
+                w ? `${w.cand.nome} (${w.cand.partido ?? "–"}) · ${w.pctValidos.toFixed(1)}% dos válidos` : "—"
+              }</p>`,
+            ]
+              .filter(Boolean)
+              .join(""),
             { className: "tooltip-padrao" }
           );
         }}

@@ -1,9 +1,10 @@
-import { Bairro, BairroSocio, Candidate, EconomiaMun, LocalVotacaoRow, Municipality, PresRow, SocioMun, VotacaoData, Zona } from "@/types";
+import { Bairro, BairroSocio, Candidate, EconomiaMun, LocalVotacaoRow, Municipality, OcupacaoInfo, PresRow, SocioMun, VotacaoData, Zona } from "@/types";
 import raw from "@/data/votacao.json";
 import raw2022 from "@/data/votacao_2022.json";
 import rawSocio from "@/data/socio_sc.json";
 import rawBairrosSocio from "@/data/bairros_socio.json";
 import rawEconomia from "@/data/economia_sc.json";
+import rawOcupacoes from "@/data/ocupacoes_sc.json";
 
 export const data = raw as unknown as VotacaoData;
 export const data2022 = raw2022 as unknown as VotacaoData;
@@ -13,6 +14,25 @@ export const economia = rawEconomia as unknown as EconomiaMun[];
 
 const economiaMapa = new Map(economia.map((e) => [e.ibge, e]));
 export const economiaPorIbge = (ibge: number | string) => economiaMapa.get(Number(ibge));
+
+// RAIS por ocupacao (CBO 6 digitos): ocupacoes com >= 300 vínculos no estado
+export const ocupacoes = rawOcupacoes.ocupacoes as OcupacaoInfo[];
+
+export interface CelulaOcup {
+  n: number;
+  sal: number | null;
+}
+const celulasOcup = rawOcupacoes.celulas as [number, number, number, (number | null)][];
+const ocupPorMun = new Map<number, Map<number, CelulaOcup>>();
+for (const [ibge, oi, n, sal] of celulasOcup) {
+  let m = ocupPorMun.get(ibge);
+  if (!m) {
+    m = new Map();
+    ocupPorMun.set(ibge, m);
+  }
+  m.set(oi, { n, sal });
+}
+export const ocupacaoPorMun = ocupPorMun;
 
 const socioMapa = new Map(socio.map((s) => [s.ibge, s]));
 export const socioPorIbge = (ibge: number | string) => socioMapa.get(String(ibge));

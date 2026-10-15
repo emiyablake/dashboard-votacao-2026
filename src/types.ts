@@ -210,3 +210,10 @@ export interface EconomiaMun {
   pct_servicos_vendas: number | null;
   pct_militares: number | null;
 }
+
+/** ocupacao (CBO 2002, subgrupo de 6 digitos) com total de vínculos no estado */
+export interface OcupacaoInfo {
+  cod: string;
+  nome: string;
+  n: number;
+}

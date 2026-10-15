@@ -10,9 +10,10 @@ import CoropleticoTab from "@/components/tabs/CoropleticoTab";
 import SocioeconomicoTab from "@/components/tabs/SocioeconomicoTab";
 import VulnerabilidadeTab from "@/components/tabs/VulnerabilidadeTab";
 import TerritorioTab from "@/components/tabs/TerritorioTab";
+import OcupacoesTab from "@/components/tabs/OcupacoesTab";
 import { data, fmt } from "@/lib/data";
 
-type Tab = "geral" | "bairros" | "locais" | "zonas" | "abstencao" | "coropletico" | "socio" | "vulnerabilidade" | "territorio";
+type Tab = "geral" | "bairros" | "locais" | "zonas" | "abstencao" | "coropletico" | "socio" | "vulnerabilidade" | "territorio" | "ocupacoes";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "geral", label: "Visão geral" },
@@ -24,6 +25,7 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "socio", label: "Socioeconômico" },
   { id: "vulnerabilidade", label: "Vulnerabilidade" },
   { id: "territorio", label: "Território" },
+  { id: "ocupacoes", label: "Ocupações" },
 ];
 
 export default function Home() {
@@ -80,6 +82,7 @@ export default function Home() {
         {painel("socio", <SocioeconomicoTab />)}
         {painel("vulnerabilidade", <VulnerabilidadeTab />)}
         {painel("territorio", <TerritorioTab />)}
+        {painel("ocupacoes", <OcupacoesTab />)}
 
         <footer className="mt-10 border-t border-zinc-800 pt-4 text-xs text-zinc-500">
           Dados oficiais de boletins de urna (arquivo bweb_1t_SC_051020261403, TSE). Este
