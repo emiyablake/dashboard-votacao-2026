@@ -2,27 +2,21 @@
 
 import { useMemo, useState } from "react";
 import ComboBox from "@/components/ui/ComboBox";
-import {
-  bairrosSocio,
-  data,
-  data2022,
-  fmt,
-} from "@/lib/data";
+import { bairrosSocio, data, data2022, fmt } from "@/lib/data";
 import { slug } from "@/lib/download";
-import { axisStyle, ChartPanel, ExportMenu, tooltipProps } from "@/lib/ui";
+import { axisStyle, ChartPanel, ExportMenu } from "@/lib/ui";
 import {
+  Bar,
   CartesianGrid,
-  Cell,
-  Line,
+  ComposedChart,
+  Legend,
   ResponsiveContainer,
-  Scatter,
-  ScatterChart,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
 
-/** eixo X: indicadores censitarios disponiveis */
+/** indicadores censitarios disponiveis (Censo 2022, por bairro oficial IBGE) */
 const INDICADORES = [
   { id: "pct_alfabetizadas_15", nome: "Alfabetização 15+ (%)", invertido: true },
   { id: "pct_esgoto_rede", nome: "Esgoto em rede (%)", invertido: true },
@@ -34,21 +28,17 @@ const INDICADORES = [
 
 type IdIndicador = (typeof INDICADORES)[number]["id"];
 
-interface Ponto {
+const TOP_N = 15;
+
+interface Registro {
   ibge: number;
   municipio: string;
   bairro: string;
-  x: number;
-  y: number;
+  indicador: number;
+  abstencao: number;
   aptos: number;
   cobertura: number | null;
-  cor: string;
-}
-
-function corMun(nome: string) {
-  let h = 0;
-  for (let i = 0; i < nome.length; i++) h = (h * 31 + nome.charCodeAt(i)) % 360;
-  return `hsl(${h}, 65%, 58%)`;
+  rotulo: string;
 }
 
 function pearson(xs: number[], ys: number[]) {
@@ -72,35 +62,21 @@ function forca(r: number): string {
   return a >= 0.7 ? "forte" : a >= 0.4 ? "moderada" : a >= 0.2 ? "fraca" : "muito fraca";
 }
 
+function truncarRotulo(v: string) {
+  return v.length > 24 ? `${v.slice(0, 23)}…` : v;
+}
+
 export default function VulnerabilidadeTab() {
   const [munSel, setMunSel] = useState<string>(""); // "" = todos
   const [idX, setIdX] = useState<IdIndicador>("pct_alfabetizadas_15");
-  const [idY, setIdY] = useState<string>("abst26");
+  const [anoAbst, setAnoAbst] = useState<"2026" | "2022">("2026");
+  const [ordenarPor, setOrdenarPor] = useState<"indicador" | "abstencao">("indicador");
 
-  // candidatos a presidente 2026 com representatividade estadual
-  const candidatos = useMemo(() => {
-    const { validos } = (() => {
-      const rows = data.cargoTotals.filter((t) => t.cdCargo === 1);
-      const get = (tipo: string) => rows.find((r) => r.tipo === tipo)?.total ?? 0;
-      return { validos: get("Nominal") + get("Legenda") };
-    })();
-    return data.candidates
-      .filter((c) => c.cdCargo === 1 && c.tipo === "Nominal" && validos > 0 && (c.total / validos) * 100 >= 0.5)
-      .sort((a, b) => b.total - a.total);
-  }, []);
-
-  // votos por bairro (2026) para % validos dos candidatos
-  const votosBairro = useMemo(() => {
-    const mapa = new Map<string, { aptos: number; abst: number; validos: number; porCand: Map<number, number> }>();
+  const abst26 = useMemo(() => {
+    const mapa = new Map<string, { aptos: number; pct: number }>();
     for (const b of data.bairros) {
-      let validos = 0;
-      const porCand = new Map<number, number>();
-      for (const v of b.votos) {
-        if (v.c !== 1) continue;
-        validos += v.n;
-        porCand.set(v.v, v.n);
-      }
-      mapa.set(`${b.ibge}|${b.bairro}`, { aptos: b.aptos, abst: b.abst, validos, porCand });
+      if (b.aptos > 0)
+        mapa.set(`${b.ibge}|${b.bairro}`, { aptos: b.aptos, pct: (b.abst / b.aptos) * 100 });
     }
     return mapa;
   }, []);
@@ -122,83 +98,67 @@ export default function VulnerabilidadeTab() {
   }, []);
 
   const indicadorX = INDICADORES.find((i) => i.id === idX)!;
-  const nomeY =
-    idY === "abst26"
-      ? `Abstenção ${data.meta.ano} (%)`
-      : idY === "abst22"
-      ? `Abstenção ${data2022.meta.ano} (%)`
-      : `% válidos — ${candidatos.find((c) => `cand:${c.id}` === idY)?.nome ?? "candidato"}`;
+  const nomeAbst =
+    anoAbst === "2026" ? `Abstenção ${data.meta.ano} (%)` : `Abstenção ${data2022.meta.ano} (%)`;
 
-  const pontos = useMemo<Ponto[]>(() => {
-    const pts: Ponto[] = [];
+  const rows = useMemo<Registro[]>(() => {
+    const pts: Registro[] = [];
     for (const s of bairrosSocio) {
       if (munSel && String(s.ibge) !== munSel) continue;
-      const x = s[idX];
-      if (x == null) continue;
-      let y: number | null = null;
-      if (idY === "abst26") {
-        const v = votosBairro.get(`${s.ibge}|${s.bairro}`);
-        if (v && v.aptos > 0) y = (v.abst / v.aptos) * 100;
-      } else if (idY === "abst22") {
-        y = abst22.get(`${s.ibge}|${s.bairro}`) ?? null;
+      const ind = s[idX];
+      if (ind == null) continue;
+      let abst: number | null = null;
+      let aptos = 0;
+      if (anoAbst === "2026") {
+        const v = abst26.get(`${s.ibge}|${s.bairro}`);
+        if (v) {
+          abst = v.pct;
+          aptos = v.aptos;
+        }
       } else {
-        const candId = Number(idY.split(":")[1]);
-        const v = votosBairro.get(`${s.ibge}|${s.bairro}`);
-        if (v && v.validos > 0) y = ((v.porCand.get(candId) ?? 0) / v.validos) * 100;
+        abst = abst22.get(`${s.ibge}|${s.bairro}`) ?? null;
       }
-      if (y == null) continue;
+      if (abst == null) continue;
       pts.push({
         ibge: s.ibge,
         municipio: s.municipio,
         bairro: s.bairro,
-        x: Number(x),
-        y: Number(y.toFixed(2)),
-        aptos: votosBairro.get(`${s.ibge}|${s.bairro}`)?.aptos ?? 0,
+        indicador: Number(ind),
+        abstencao: Number(abst.toFixed(2)),
+        aptos,
         cobertura: s.cobertura_pct,
-        cor: corMun(s.municipio),
+        rotulo: `${s.bairro} · ${s.municipio}`,
       });
     }
     return pts;
-  }, [munSel, idX, idY, votosBairro, abst22]);
+  }, [munSel, idX, anoAbst, abst26, abst22]);
+
+  const top = useMemo(() => {
+    const dir = ordenarPor === "indicador" && indicadorX.invertido ? 1 : -1;
+    const chave = ordenarPor === "indicador" ? "indicador" : "abstencao";
+    return [...rows].sort((a, b) => dir * (a[chave] - b[chave])).slice(0, TOP_N);
+  }, [rows, ordenarPor, indicadorX]);
 
   const r = useMemo(
-    () => pearson(pontos.map((p) => p.x), pontos.map((p) => p.y)),
-    [pontos]
+    () => pearson(rows.map((p) => p.indicador), rows.map((p) => p.abstencao)),
+    [rows]
   );
 
-  const linhaTendencia = useMemo(() => {
-    if (pontos.length < 3) return [];
-    const xs = pontos.map((p) => p.x);
-    const ys = pontos.map((p) => p.y);
-    const n = xs.length;
-    const mx = xs.reduce((a, b) => a + b, 0) / n;
-    const my = ys.reduce((a, b) => a + b, 0) / n;
-    let num = 0, den = 0;
-    for (let i = 0; i < n; i++) {
-      num += (xs[i] - mx) * (ys[i] - my);
-      den += (xs[i] - mx) ** 2;
-    }
-    if (den === 0) return [];
-    const a = num / den, b0 = my - a * mx;
-    const minX = Math.min(...xs), maxX = Math.max(...xs);
-    return [
-      { x: minX, y: Number((a * minX + b0).toFixed(2)) },
-      { x: maxX, y: Number((a * maxX + b0).toFixed(2)) },
-    ];
-  }, [pontos]);
-
   const dadosExport = () => ({
-    nome: `votacao-sc-vulnerabilidade-${idX}-${slug(idY)}${munSel ? `-${slug(pontos[0]?.municipio ?? "")}` : ""}`,
-    titulo: `${indicadorX.nome} × ${nomeY} (Censo 2022 × votação)`,
-    linhas: pontos.map((p) => ({
+    nome: `votacao-sc-vulnerabilidade-${idX}-abstencao-${anoAbst}${munSel ? `-${slug(rows[0]?.municipio ?? "")}` : ""}`,
+    titulo: `${indicadorX.nome} × ${nomeAbst} (Censo 2022 × votação)`,
+    linhas: rows.map((p) => ({
       municipio: p.municipio,
       bairro: p.bairro,
-      [indicadorX.nome]: p.x,
-      [nomeY]: p.y,
+      [indicadorX.nome]: p.indicador,
+      [nomeAbst]: p.abstencao,
       aptos_2026: p.aptos,
       cobertura_cruzamento_pct: p.cobertura ?? "",
     })),
   });
+
+  const fmtIndicador = (v: number) =>
+    idX === "populacao" || idX === "densidade" ? fmt(v) : String(v);
 
   return (
     <div className="space-y-4">
@@ -217,90 +177,122 @@ export default function VulnerabilidadeTab() {
         >
           {INDICADORES.map((i) => (
             <option key={i.id} value={i.id}>
-              X: {i.nome}
+              Indicador: {i.nome}
             </option>
           ))}
         </select>
         <select
-          value={idY}
-          onChange={(e) => setIdY(e.target.value)}
+          value={anoAbst}
+          onChange={(e) => setAnoAbst(e.target.value as "2026" | "2022")}
           className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm"
         >
-          <option value="abst26">Y: Abstenção {data.meta.ano} (%)</option>
-          <option value="abst22">Y: Abstenção {data2022.meta.ano} (%)</option>
-          {candidatos.map((c) => (
-            <option key={c.id} value={`cand:${c.id}`}>
-              Y: % válidos — {c.nome} ({data.meta.ano})
-            </option>
-          ))}
+          <option value="2026">Abstenção: {data.meta.ano}</option>
+          <option value="2022">Abstenção: {data2022.meta.ano}</option>
         </select>
-        <span className="text-xs text-slate-400">{pontos.length} bairros</span>
+        <select
+          value={ordenarPor}
+          onChange={(e) => setOrdenarPor(e.target.value as "indicador" | "abstencao")}
+          className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm"
+        >
+          <option value="indicador">
+            Ordenar por: indicador{indicadorX.invertido ? " (menor = mais vulnerável)" : ""}
+          </option>
+          <option value="abstencao">Ordenar por: abstenção</option>
+        </select>
+        <span className="text-xs text-slate-400">
+          {rows.length} bairros · exibindo top {Math.min(TOP_N, rows.length)}
+        </span>
         <div className="ml-auto">
           <ExportMenu getDados={dadosExport} />
         </div>
       </div>
 
       <ChartPanel
-        titulo={`${indicadorX.nome} × ${nomeY}`}
+        titulo={`${indicadorX.nome} × ${nomeAbst}`}
         descricao={
-          r != null
-            ? `Cada bolha é um bairro (cor = município; passe o mouse para ver aptos e cobertura). Correlação de Pearson: r = ${r.toFixed(2)} (${forca(r)}${indicadorX.invertido && r > 0 ? " — lembre que menor valor do indicador = mais vulnerabilidade" : ""}).`
-            : "Cada bolha é um bairro (cor = município; passe o mouse para ver aptos e cobertura)."
+          (r != null
+            ? `Correlação de Pearson sobre os ${rows.length} bairros filtrados: r = ${r.toFixed(2)} (${forca(r)}). `
+            : "") +
+          (indicadorX.invertido
+            ? "Nos indicadores marcados, valores menores indicam mais vulnerabilidade."
+            : "")
         }
       >
-        <ResponsiveContainer width="100%" height={520}>
-          <ScatterChart margin={{ top: 10, right: 20, bottom: 10, left: 0 }}>
-            <CartesianGrid stroke="#1e293b" />
-            <XAxis
-              type="number"
-              dataKey="x"
-              name={indicadorX.nome}
-              tick={axisStyle}
-              domain={["auto", "auto"]}
-              tickFormatter={(v) => (idX === "populacao" || idX === "densidade" ? fmt(v) : String(v))}
-            />
-            <YAxis type="number" dataKey="y" name={nomeY} tick={axisStyle} domain={["auto", "auto"]} />
-            <Tooltip
-              {...tooltipProps}
-              content={({ active, payload }) => {
-                if (!active || !payload?.length) return null;
-                const p = payload[0].payload as Ponto;
-                return (
-                  <div className="rounded-lg border border-slate-700 bg-slate-900/95 px-3 py-2 text-xs shadow-xl">
-                    <p className="mb-1 font-semibold text-slate-100">
-                      {p.bairro} <span className="font-normal text-slate-400">· {p.municipio}</span>
-                    </p>
-                    <p className="text-slate-300">
-                      {indicadorX.nome}: <b>{fmt(p.x)}</b>
-                    </p>
-                    <p className="text-slate-300">
-                      {nomeY}: <b>{p.y.toFixed(1)}%</b>
-                    </p>
-                    <p className="text-slate-400">aptos 2026: {fmt(p.aptos)}</p>
-                    {p.cobertura != null && (
-                      <p className="text-slate-500">cobertura do cruzamento: {p.cobertura}%</p>
-                    )}
-                  </div>
-                );
-              }}
-            />
-            {linhaTendencia.length === 2 && (
-              <Line
-                data={linhaTendencia}
-                dataKey="y"
-                stroke="#64748b"
-                strokeDasharray="5 5"
-                dot={false}
-                isAnimationActive={false}
+        {top.length === 0 ? (
+          <p className="py-16 text-center text-sm text-slate-500">
+            Nenhum bairro encontrado com os filtros atuais.
+          </p>
+        ) : (
+          <ResponsiveContainer width="100%" height={520}>
+            <ComposedChart data={top} margin={{ top: 10, right: 10, bottom: 10, left: 0 }}>
+              <CartesianGrid stroke="#1e293b" />
+              <XAxis
+                dataKey="rotulo"
+                tick={{ fill: "#94a3b8", fontSize: 11 }}
+                tickFormatter={truncarRotulo}
+                angle={-35}
+                textAnchor="end"
+                interval={0}
+                height={110}
               />
-            )}
-            <Scatter data={pontos} isAnimationActive={false}>
-              {pontos.map((p) => (
-                <Cell key={`${p.ibge}|${p.bairro}`} fill={p.cor} fillOpacity={0.75} />
-              ))}
-            </Scatter>
-          </ScatterChart>
-        </ResponsiveContainer>
+              <YAxis
+                yAxisId="ind"
+                tick={axisStyle}
+                domain={[0, "auto"]}
+                tickFormatter={fmtIndicador}
+              />
+              <YAxis
+                yAxisId="abs"
+                orientation="right"
+                tick={axisStyle}
+                domain={[0, 100]}
+                tickFormatter={(v) => `${v}%`}
+              />
+              <Tooltip
+                content={({ active, payload }) => {
+                  if (!active || !payload?.length) return null;
+                  const p = payload[0].payload as Registro;
+                  return (
+                    <div className="rounded-lg border border-slate-700 bg-slate-900/95 px-3 py-2 text-xs shadow-xl">
+                      <p className="mb-1 font-semibold text-slate-100">
+                        {p.bairro} <span className="font-normal text-slate-400">· {p.municipio}</span>
+                      </p>
+                      <p className="text-slate-300">
+                        {indicadorX.nome}: <b>{fmtIndicador(p.indicador)}</b>
+                      </p>
+                      <p className="text-slate-300">
+                        {nomeAbst}: <b>{p.abstencao.toFixed(1)}%</b>
+                      </p>
+                      {p.aptos > 0 && <p className="text-slate-400">aptos 2026: {fmt(p.aptos)}</p>}
+                      {p.cobertura != null && (
+                        <p className="text-slate-500">cobertura do cruzamento: {p.cobertura}%</p>
+                      )}
+                    </div>
+                  );
+                }}
+              />
+              <Legend wrapperStyle={{ fontSize: 12, color: "#94a3b8" }} />
+              <Bar
+                yAxisId="ind"
+                dataKey="indicador"
+                name={indicadorX.nome}
+                fill="#38bdf8"
+                radius={[3, 3, 0, 0]}
+                isAnimationActive={false}
+                maxBarSize={30}
+              />
+              <Bar
+                yAxisId="abs"
+                dataKey="abstencao"
+                name={nomeAbst}
+                fill="#f87171"
+                radius={[3, 3, 0, 0]}
+                isAnimationActive={false}
+                maxBarSize={30}
+              />
+            </ComposedChart>
+          </ResponsiveContainer>
+        )}
       </ChartPanel>
 
       <p className="text-xs text-slate-500">
