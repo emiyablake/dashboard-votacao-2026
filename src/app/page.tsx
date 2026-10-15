@@ -8,9 +8,10 @@ import BairrosTab from "@/components/tabs/BairrosTab";
 import LocaisTab from "@/components/tabs/LocaisTab";
 import CoropleticoTab from "@/components/tabs/CoropleticoTab";
 import SocioeconomicoTab from "@/components/tabs/SocioeconomicoTab";
+import VulnerabilidadeTab from "@/components/tabs/VulnerabilidadeTab";
 import { data, fmt } from "@/lib/data";
 
-type Tab = "geral" | "bairros" | "locais" | "zonas" | "abstencao" | "coropletico" | "socio";
+type Tab = "geral" | "bairros" | "locais" | "zonas" | "abstencao" | "coropletico" | "socio" | "vulnerabilidade";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "geral", label: "Visão geral" },
@@ -20,6 +21,7 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "abstencao", label: "Abstenções" },
   { id: "coropletico", label: "Mapa coroplético" },
   { id: "socio", label: "Socioeconômico" },
+  { id: "vulnerabilidade", label: "Vulnerabilidade" },
 ];
 
 export default function Home() {
@@ -74,6 +76,7 @@ export default function Home() {
         {painel("abstencao", <AbstencaoTab />)}
         {painel("coropletico", <CoropleticoTab />)}
         {painel("socio", <SocioeconomicoTab />)}
+        {painel("vulnerabilidade", <VulnerabilidadeTab />)}
 
         <footer className="mt-10 border-t border-slate-800 pt-4 text-xs text-slate-500">
           Dados oficiais de boletins de urna (arquivo bweb_1t_SC_051020261403, TSE). Este
