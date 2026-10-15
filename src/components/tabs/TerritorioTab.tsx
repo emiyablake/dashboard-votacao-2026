@@ -49,14 +49,13 @@ const INDICADORES_ESTADO = [
   { id: "pct_esgoto_rede", nome: "Esgoto a rede" },
   { id: "pct_agua_rede", nome: "Água encanada" },
   { id: "pct_lixo_coletado", nome: "Lixo coletado" },
-  { id: "pct_banheiro", nome: "Domicílios com banheiro" },
 ] as const;
 
 type IdIndicador = (typeof INDICADORES_ESTADO)[number]["id"];
 
 const COR_PL = "#1d4ed8";
 const COR_PT = "#ef4444";
-const COR_ABST = "#f87171";
+const COR_ABST = "#a1a1aa"; // cinza padrao da abstencao nos graficos
 
 /** perfil economico de um municipio = setor com maior share dos vínculos formais */
 function perfilDe(e: EconomiaMun | undefined): Setor | null {
@@ -291,13 +290,6 @@ export default function TerritorioTab() {
           <option value="2026">Votação: {data.meta.ano}</option>
           <option value="2022">Votação: {data2022.meta.ano}</option>
         </select>
-        <select value={idInd} onChange={(e) => setIdInd(e.target.value as IdIndicador)} className={selectCls}>
-          {INDICADORES_ESTADO.map((i) => (
-            <option key={i.id} value={i.id}>
-              Infraestrutura: {i.nome}
-            </option>
-          ))}
-        </select>
         <div className="ml-auto">
           <ExportMenu getDados={dadosExport} />
         </div>
@@ -373,6 +365,16 @@ export default function TerritorioTab() {
       </ChartPanel>
 
       {/* ---------- bloco 2: onde o Estado chega ---------- */}
+      <div className="flex flex-wrap items-center gap-3">
+        <label className="text-xs text-zinc-400">Infraestrutura:</label>
+        <select value={idInd} onChange={(e) => setIdInd(e.target.value as IdIndicador)} className={selectCls}>
+          {INDICADORES_ESTADO.map((i) => (
+            <option key={i.id} value={i.id}>
+              {i.nome}
+            </option>
+          ))}
+        </select>
+      </div>
       <ChartPanel
         titulo={`Onde o Estado chega: ${indicador.nome}`}
         descricao="Municípios coloridos pela cobertura de infraestrutura básica (Censo 2022). Verde = alta cobertura; vermelho = baixa."
