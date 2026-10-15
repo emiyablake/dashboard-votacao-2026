@@ -142,12 +142,14 @@ export const axisStyle = { fill: "#a1a1aa", fontSize: 12 };
 
 export const tooltipProps = {
   contentStyle: {
-    backgroundColor: "#18181b",
+    backgroundColor: "rgba(24, 24, 27, 0.95)",
     border: "1px solid #3f3f46",
     borderRadius: 8,
+    fontSize: 12,
+    boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.45)",
   },
-  labelStyle: { color: "#e4e4e7", fontSize: 13 },
-  itemStyle: { color: "#e4e4e7", fontSize: 13 },
+  labelStyle: { color: "#fafafa", fontSize: 12, fontWeight: 600, marginBottom: 4 },
+  itemStyle: { color: "#d4d4d8", fontSize: 12 },
 };
 
 /** escala de cores compartilhada para taxas de abstencao/comparecimento */

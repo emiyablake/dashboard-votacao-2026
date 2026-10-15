@@ -24,3 +24,55 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* ------------------------------------------------------------------
+   Tooltip padrão do painel — usado nos mapas Leaflet e nos conteúdos
+   customizados dos gráficos (recharts). Cada bloco injeta apenas os
+   dados/propriedades de que precisa.
+------------------------------------------------------------------ */
+.tooltip-padrao {
+  background: rgba(24, 24, 27, 0.95) !important; /* zinc-900 */
+  border: 1px solid #3f3f46 !important; /* zinc-700 */
+  border-radius: 8px;
+  color: #e4e4e7; /* zinc-200 */
+  padding: 8px 12px;
+  font-size: 12px;
+  line-height: 1.55;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.45);
+}
+
+.tooltip-padrao b,
+.tooltip-padrao strong {
+  color: #fafafa; /* zinc-50 */
+  font-weight: 600;
+}
+
+.tooltip-padrao .tp-titulo {
+  margin-bottom: 4px;
+  font-weight: 600;
+  color: #fafafa;
+}
+
+.tooltip-padrao .tp-linha {
+  color: #d4d4d8; /* zinc-300 */
+}
+
+.tooltip-padrao .tp-det {
+  color: #a1a1aa; /* zinc-400 */
+}
+
+.tooltip-padrao .tp-nota {
+  color: #71717a; /* zinc-500 */
+}
+
+/* neutraliza o estilo branco default do Leaflet e a setinha do tooltip */
+.leaflet-tooltip.tooltip-padrao {
+  background: rgba(24, 24, 27, 0.95);
+  border: 1px solid #3f3f46;
+  color: #e4e4e7;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.45);
+}
+
+.leaflet-tooltip.tooltip-padrao::before {
+  display: none;
+}

@@ -78,13 +78,15 @@ export default function MapaAbstencao({
               weight: 1,
             }}
           >
-            <Tooltip>
-              <div style={{ fontFamily: "inherit" }}>
-                <b>{m.nome}</b>
-                <br />
-                {fmt(m.abst)} abstenções ({taxa.toFixed(1)}% dos aptos)
-                <br />
-                Aptos: {fmt(m.aptos)} · Compareceram: {fmt(m.comp)}
+            <Tooltip className="tooltip-padrao">
+              <div>
+                <p className="tp-titulo">{m.nome}</p>
+                <p className="tp-linha">
+                  {fmt(m.abst)} abstenções ({taxa.toFixed(1)}% dos aptos)
+                </p>
+                <p className="tp-det">
+                  Aptos: {fmt(m.aptos)} · Compareceram: {fmt(m.comp)}
+                </p>
               </div>
             </Tooltip>
           </CircleMarker>

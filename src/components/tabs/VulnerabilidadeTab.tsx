@@ -253,19 +253,19 @@ export default function VulnerabilidadeTab() {
                   if (!active || !payload?.length) return null;
                   const p = payload[0].payload as Registro;
                   return (
-                    <div className="rounded-lg border border-zinc-700 bg-zinc-900/95 px-3 py-2 text-xs shadow-xl">
-                      <p className="mb-1 font-semibold text-zinc-100">
-                        {p.bairro} <span className="font-normal text-zinc-400">· {p.municipio}</span>
+                    <div className="tooltip-padrao">
+                      <p className="tp-titulo">
+                        {p.bairro} <span className="tp-det">· {p.municipio}</span>
                       </p>
-                      <p className="text-zinc-300">
+                      <p className="tp-linha">
                         {indicadorX.nome}: <b>{fmtIndicador(p.indicador)}</b>
                       </p>
-                      <p className="text-zinc-300">
+                      <p className="tp-linha">
                         {nomeAbst}: <b>{p.abstencao.toFixed(1)}%</b>
                       </p>
-                      {p.aptos > 0 && <p className="text-zinc-400">aptos 2026: {fmt(p.aptos)}</p>}
+                      {p.aptos > 0 && <p className="tp-det">aptos 2026: {fmt(p.aptos)}</p>}
                       {p.cobertura != null && (
-                        <p className="text-zinc-500">cobertura do cruzamento: {p.cobertura}%</p>
+                        <p className="tp-nota">cobertura do cruzamento: {p.cobertura}%</p>
                       )}
                     </div>
                   );

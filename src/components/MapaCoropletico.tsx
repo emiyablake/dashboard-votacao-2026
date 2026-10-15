@@ -52,13 +52,14 @@ export default function MapaCoropletico({
     if (!mun) return;
     const w = winnerIn(mun.votos, 1);
     layer.bindTooltip(
-      `<div style="font-family:inherit">
-        <b>${mun.nome}</b><br/>
-        ${fmt(mun.aptos)} aptos · ${fmt(mun.secoes)} seções<br/>
-        Comparecimento: ${pct(mun.comp, mun.aptos).toFixed(1)}%<br/>
-        Abstenção: <b>${pct(mun.abst, mun.aptos).toFixed(1)}%</b> (${fmt(mun.abst)})<br/>
-        Presidente: ${w ? `${w.cand.nome} (${w.cand.partido ?? "–"}) · ${w.pctValidos.toFixed(1)}% dos válidos` : "—"}
-      </div>`
+      `<div>
+        <p class="tp-titulo">${mun.nome}</p>
+        <p class="tp-linha">${fmt(mun.aptos)} aptos · ${fmt(mun.secoes)} seções</p>
+        <p class="tp-linha">Comparecimento: ${pct(mun.comp, mun.aptos).toFixed(1)}%</p>
+        <p class="tp-linha">Abstenção: <b>${pct(mun.abst, mun.aptos).toFixed(1)}%</b> (${fmt(mun.abst)})</p>
+        <p class="tp-linha">Presidente: ${w ? `${w.cand.nome} (${w.cand.partido ?? "–"}) · ${w.pctValidos.toFixed(1)}% dos válidos` : "—"}</p>
+      </div>`,
+      { className: "tooltip-padrao" }
     );
   };
 
