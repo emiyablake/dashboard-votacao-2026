@@ -1,13 +1,18 @@
-import { Bairro, BairroSocio, Candidate, LocalVotacaoRow, Municipality, PresRow, SocioMun, VotacaoData, Zona } from "@/types";
+import { Bairro, BairroSocio, Candidate, EconomiaMun, LocalVotacaoRow, Municipality, PresRow, SocioMun, VotacaoData, Zona } from "@/types";
 import raw from "@/data/votacao.json";
 import raw2022 from "@/data/votacao_2022.json";
 import rawSocio from "@/data/socio_sc.json";
 import rawBairrosSocio from "@/data/bairros_socio.json";
+import rawEconomia from "@/data/economia_sc.json";
 
 export const data = raw as unknown as VotacaoData;
 export const data2022 = raw2022 as unknown as VotacaoData;
 export const socio = rawSocio as unknown as SocioMun[];
 export const bairrosSocio = rawBairrosSocio as unknown as BairroSocio[];
+export const economia = rawEconomia as unknown as EconomiaMun[];
+
+const economiaMapa = new Map(economia.map((e) => [e.ibge, e]));
+export const economiaPorIbge = (ibge: number | string) => economiaMapa.get(Number(ibge));
 
 const socioMapa = new Map(socio.map((s) => [s.ibge, s]));
 export const socioPorIbge = (ibge: number | string) => socioMapa.get(String(ibge));

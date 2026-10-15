@@ -191,3 +191,22 @@ export interface BairroSocio {
   cobertura_pct: number | null;
   secoes: number;
 }
+
+/** perfil economico municipal (RAIS/MTE): setor predominante e grupos ocupacionais */
+export interface EconomiaMun {
+  ibge: number;
+  vinculos: number | null;
+  salario_medio: number | null;
+  pct_agro: number | null;
+  pct_industria: number | null;
+  pct_construcao: number | null;
+  pct_comercio: number | null;
+  pct_servicos: number | null;
+  pct_dirigentes_prof: number | null;
+  pct_tecnicos: number | null;
+  pct_operarios: number | null;
+  pct_agro_cbo: number | null;
+  pct_ind_construcao: number | null;
+  pct_servicos_vendas: number | null;
+  pct_militares: number | null;
+}
