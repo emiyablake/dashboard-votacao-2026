@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import PresBairroChart from "@/components/charts/PresBairroChart";
 import ComboBox from "@/components/ui/ComboBox";
-import { data, data2022, fmt, partidoColor, presPorBairro, pct, socioPorBairro, winnerInOf } from "@/lib/data";
+import { data, data2022, fmt, partidoColor, presPorBairro, pct, winnerInOf } from "@/lib/data";
 import { slug } from "@/lib/download";
 import { ExportMenu } from "@/lib/ui";
 import { Bairro } from "@/types";
@@ -64,7 +64,6 @@ export default function BairrosTab() {
       linhas: linhas.map(({ k, b26, b22 }) => {
         const w26 = b26 ? winnerInOf(data, b26.votos, 1) : null;
         const w22 = b22 ? winnerInOf(data2022, b22.votos, 1) : null;
-        const socio = socioPorBairro(munBairro, k);
         return {
           bairro: k,
           secoes_2026: b26?.secoes ?? "",
@@ -83,12 +82,6 @@ export default function BairrosTab() {
             : "",
           vencedor_2022: w22?.cand.nome ?? "",
           partido_2022: w22?.cand.partido ?? "",
-          censo_2022_populacao: socio?.populacao ?? "",
-          censo_2022_densidade_km2: socio?.densidade ?? "",
-          censo_2022_pct_60_mais: socio?.pct_60_mais ?? "",
-          censo_2022_pct_alfabetizadas_15: socio?.pct_alfabetizadas_15 ?? "",
-          censo_2022_pct_esgoto_rede: socio?.pct_esgoto_rede ?? "",
-          bairro_ibge_referencia: socio?.bairro_ibge ?? "",
         };
       }),
     };
