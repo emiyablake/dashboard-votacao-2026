@@ -17,6 +17,7 @@ import {
   data2022,
   economia,
   economiaPorIbge,
+  fmt,
   pct,
   socio,
   winnerInOf,
@@ -190,11 +191,26 @@ export default function TerritorioTab() {
   }, [votacao, socioPorIbgeMap, idInd, quartis]);
 
   // ---------- KPIs ----------
-  const kpis = useMemo(() => {
+  const kpisEco = useMemo(() => {
     const grupos = agrega(votacao, (m) => perfis.get(m.ibge)?.nome ?? "Sem dados RAIS");
     let maior: GrupoAgg | null = null;
-    for (const g of grupos.values())
+    let agro: GrupoAgg | null = null;
+    for (const g of grupos.values()) {
       if (!maior || g.muns > maior.muns) maior = g;
+      if (g.nome === "Agropecuária") agro = g;
+    }
+    const vinculos = economia.reduce((a, e) => a + (e.vinculos ?? 0), 0);
+    const aptos = votacao.municipalities.reduce((a, m) => a + m.aptos, 0);
+    const abst = votacao.municipalities.reduce((a, m) => a + m.abst, 0);
+    return {
+      maior,
+      agroMuns: agro?.muns ?? 0,
+      vinculos,
+      abstEstadual: pct(abst, aptos),
+    };
+  }, [votacao, perfis]);
+
+  const kpisInfra = useMemo(() => {
     const coberturas = socio
       .map((s) => s[idInd] as number | null)
       .filter((v): v is number => v != null)
@@ -205,11 +221,10 @@ export default function TerritorioTab() {
       const v = s[idInd] as number | null;
       if (v != null && (!pior || v < pior.v)) pior = { nome: s.nome, v };
     }
-    const qs = porQuartil;
-    const abstQ1 = qs.find((q) => q.nome.startsWith("Q1"))?.abstencao;
-    const abstQ4 = qs.find((q) => q.nome.startsWith("Q4"))?.abstencao;
-    return { maior, mediana, pior, abstQ1, abstQ4 };
-  }, [votacao, perfis, idInd, porQuartil]);
+    const abstQ1 = porQuartil.find((q) => q.nome.startsWith("Q1"))?.abstencao;
+    const abstQ4 = porQuartil.find((q) => q.nome.startsWith("Q4"))?.abstencao;
+    return { mediana, pior, abstQ1, abstQ4 };
+  }, [idInd, porQuartil]);
 
   // ---------- export ----------
   const dadosExport = () => {
@@ -298,27 +313,23 @@ export default function TerritorioTab() {
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Card
           title="Geografia dominante"
-          value={kpis.maior?.nome ?? "—"}
-          sub={`${kpis.maior?.muns ?? 0} de 295 municípios (RAIS 2025)`}
+          value={kpisEco.maior?.nome ?? "—"}
+          sub={`${kpisEco.maior?.muns ?? 0} de 295 municípios (RAIS 2025)`}
         />
         <Card
-          title={`${indicador.nome} mediano`}
-          value={kpis.mediana != null ? `${kpis.mediana.toFixed(1)}%` : "—"}
-          sub="mediana dos 295 municípios (Censo 2022)"
+          title="Perfil Agropecuária"
+          value={`${kpisEco.agroMuns} municípios`}
+          sub="agro ≥ 15% dos vínculos formais"
         />
         <Card
-          title="Menor cobertura"
-          value={kpis.pior ? kpis.pior.nome : "—"}
-          sub={kpis.pior ? `${kpis.pior.v.toFixed(1)}% dos domicílios` : ""}
+          title="Vínculos formais no estado"
+          value={fmt(kpisEco.vinculos)}
+          sub="RAIS/MTE 2025"
         />
         <Card
-          title="Abstenção Q1 × Q4"
-          value={
-            kpis.abstQ1 != null && kpis.abstQ4 != null
-              ? `${kpis.abstQ1.toFixed(1)}% × ${kpis.abstQ4.toFixed(1)}%`
-              : "—"
-          }
-          sub="quartil menos atendido × mais atendido"
+          title={`Abstenção em ${ano}`}
+          value={`${kpisEco.abstEstadual.toFixed(1)}%`}
+          sub="média estadual, todos os municípios"
         />
       </div>
 
@@ -374,6 +385,27 @@ export default function TerritorioTab() {
             </option>
           ))}
         </select>
+      </div>
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+        <Card
+          title={`${indicador.nome} mediano`}
+          value={kpisInfra.mediana != null ? `${kpisInfra.mediana.toFixed(1)}%` : "—"}
+          sub="mediana dos 295 municípios (Censo 2022)"
+        />
+        <Card
+          title="Menor cobertura"
+          value={kpisInfra.pior ? kpisInfra.pior.nome : "—"}
+          sub={kpisInfra.pior ? `${kpisInfra.pior.v.toFixed(1)}% dos domicílios` : ""}
+        />
+        <Card
+          title="Abstenção Q1 × Q4"
+          value={
+            kpisInfra.abstQ1 != null && kpisInfra.abstQ4 != null
+              ? `${kpisInfra.abstQ1.toFixed(1)}% × ${kpisInfra.abstQ4.toFixed(1)}%`
+              : "—"
+          }
+          sub="quartil menos atendido × mais atendido"
+        />
       </div>
       <ChartPanel
         titulo={`Onde o Estado chega: ${indicador.nome}`}
